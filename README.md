@@ -76,6 +76,9 @@ retail-lakehouse-pipeline/
 ├── docs/
 │   ├── architecture.md
 │   └── data_dictionary.md
+└── dataset/
+│   ├── Data/CSVs
+│   └── ddl/walmart_schema.sql
 └── .github/
     └── workflows/
 ```
