@@ -47,8 +47,6 @@ I use Lakeflow Connect's query-based connector instead: a cursor column plus a p
 
 The tradeoff I accepted: this is scheduled polling, not continuous capture, and each run captures only the latest row state, not every intermediate change between runs. I account for this explicitly in the snapshot design rather than discovering it as a surprise at the dimension history stage.
 
-I am flagging this here, upfront, because claiming CDC when the mechanism is query-based incremental ingestion is the kind of inaccuracy that does not survive a technical interview.
-
 ## Known limitations (deliberate, not oversights)
 
 - **Soft/hard deletes are not tracked in bronze.** Source tables have an `is_active` flag that could support deletion tracking, but wiring it up (`deletion_condition`) requires Databricks Asset Bundles or a direct REST API call, since it is not exposed in the ingestion UI. Deferred given the project timeline. Bronze will silently retain deleted source rows until this is implemented.
