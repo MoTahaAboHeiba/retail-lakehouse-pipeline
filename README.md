@@ -58,12 +58,14 @@ The tradeoff I accepted: this is scheduled polling, not continuous capture, and 
 retail-lakehouse-pipeline/
 ├── README.md
 ├── .gitignore
-├── dbt_walmart/
+├── dbt/
 │   ├── models/
 │   │   ├── source/
-│   │   ├── silver_t/
-│   │   ├── silver_b/
+│   │   ├── silver_tech/
+│   │   ├── silver_business/
 │   │   └── gold/
+│   ├── macros/
+│   │   └── custom_schema.sql
 │   ├── snapshots/
 │   ├── tests/
 │   └── dbt_project.yml
