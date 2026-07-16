@@ -80,24 +80,6 @@
         ]
     },
     {
-        "ref_name": "employees_tech",
-        "alias": "e",
-        "join_condition": "o.store_id = e.store_id",
-        "columns": [
-            {"col": "employee_id"},
-            {"col": "store_id", "as": "employee_store_id"},
-            {"col": "first_name", "as": "employee_first_name"},
-            {"col": "last_name", "as": "employee_last_name"},
-            {"col": "email", "as": "employee_email"},
-            {"col": "job_title"},
-            {"col": "salary"},
-            {"col": "created_timestamp", "as": "employee_created_timestamp"},
-            {"col": "updated_timestamp", "as": "employee_updated_timestamp"},
-            {"col": "is_active", "as": "employee_is_active"},
-            {"col": "processed_at", "as": "employee_processed_at"}
-        ]
-    },
-    {
         "ref_name": "stores_tech",
         "alias": "s",
         "join_condition": "o.store_id = s.store_id",
