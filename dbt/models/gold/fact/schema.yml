@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: fact_orders
+    description: >
+      Gold-layer fact table at order line item grain, sourced from obt_business.
+    columns:
+      - name: order_item_id
+        data_tests:
+          - not_null
+          - unique
+      - name: order_id
+        data_tests:
+          - not_null
+      - name: product_id
+        data_tests:
+          - not_null
+      - name: store_id
+        data_tests:
+          - not_null
+      - name: customer_id
+        data_tests:
+          - not_null
