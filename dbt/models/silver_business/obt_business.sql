@@ -5,7 +5,7 @@
   IMPORTANT: list order below encodes join dependency order.
   orders_tech must stay first (it's the join anchor).
   order_items_tech must stay before products_tech, because products_tech
-  joins on oi.product_id, not o.product_id.
+  joins on oi.product_i d, not o.product_id.
   Do not reorder this list without checking each entry's join_condition
   against what alias it depends on.
 #}
@@ -104,6 +104,7 @@ SELECT
         {% endfor %}
         {%- if not loop.last %},{% endif %}
     {% endfor %}
+    , CONCAT(c.first_name, ' ', c.last_name) AS customer_name
     , current_timestamp() AS obt_b_processed_at
 
 FROM
