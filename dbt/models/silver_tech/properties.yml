@@ -1,18 +1,132 @@
 version: 2
 
 models:
-  - name: products_tech
+  - name: customers_tech
+    description: >
+      Incremental staging model for customer dimension data sourced from bronze.
     columns:
-      - name: product_id
-        data_tests: 
-          - not_null
-          - unique:
-              config:
-                where: "price > 0"
-
-  - name: orders_tech
-    columns:
-      - name: order_id
-        data_tests: 
+      - name: customer_id
+        description: Primary key for each customer record.
+        data_tests:
           - not_null
           - unique
+      - name: email
+        description: Customer email address used for identity and contact data.
+        data_tests:
+          - not_null
+
+  - name: employees_tech
+    description: >
+      Incremental staging model for employee records and their store assignments.
+    columns:
+      - name: employee_id
+        description: Primary key for each employee.
+        data_tests:
+          - not_null
+          - unique
+      - name: store_id
+        description: Store associated with the employee.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stores_tech')
+                field: store_id
+
+  - name: orders_tech
+    description: >
+      Incremental staging model for order-level transaction data.
+    columns:
+      - name: order_id
+        description: Primary key for each order.
+        data_tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: Customer linked to the order.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('customers_tech')
+                field: customer_id
+      - name: store_id
+        description: Store where the order was placed.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stores_tech')
+                field: store_id
+      - name: total_amount
+        description: Gross order amount captured in the source system.
+        data_tests:
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
+
+  - name: order_items_tech
+    description: >
+      Incremental staging model for order line items and quantities.
+    columns:
+      - name: order_item_id
+        description: Unique identifier for each order line item.
+        data_tests:
+          - not_null
+          - unique
+      - name: product_id
+        description: Product associated with the order line.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('products_tech')
+                field: product_id
+      - name: order_id
+        description: Parent order identifier for the line item.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('orders_tech')
+                field: order_id
+      - name: quantity
+        description: Quantity ordered on the line item.
+        data_tests:
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "> 0"
+
+  - name: products_tech
+    description: >
+      Incremental staging model for product master data.
+    columns:
+      - name: product_id
+        description: Primary key for each product.
+        data_tests:
+          - not_null
+          - unique
+      - name: price
+        description: Unit price of the product.
+        data_tests:
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "> 0"
+      - name: category
+        description: Product category from the source system.
+        data_tests:
+          - not_null
+
+  - name: stores_tech
+    description: >
+      Incremental staging model for store master data.
+    columns:
+      - name: store_id
+        description: Primary key for each store.
+        data_tests:
+          - not_null
+          - unique
+      - name: store_name
+        description: Human-readable store name.
+        data_tests:
+          - not_null
