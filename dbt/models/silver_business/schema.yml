@@ -2,20 +2,42 @@ version: 2
 
 models:
   - name: obt_business
+    description: >
+      Business-ready one-big-table model that combines order, customer, order item,
+      product, and store attributes into a wide analytical dataset for reporting.
+    config:
+      meta:
+        owner: "Mohamed Taha Abo Heiba"
+        layer: "silver_business"
     columns:
       - name: order_id
+        description: Primary order key for the analytical grain.
         data_tests:
           - not_null
       - name: product_id
+        description: Product associated with the underlying order line.
         data_tests:
           - not_null
       - name: store_id
+        description: Store where the order was placed.
         data_tests:
           - not_null
       - name: customer_id
+        description: Customer associated with the order.
         data_tests:
           - not_null
       - name: order_item_id
+        description: Unique line-level identifier for each order item.
         data_tests:
           - not_null
           - unique
+      - name: total_amount
+        description: Monetary value associated with the order transaction.
+        data_tests:
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: ">= 0"
+      - name: customer_name
+        description: Concatenated full name derived from the customer model.
+        data_tests:
+          - not_null
