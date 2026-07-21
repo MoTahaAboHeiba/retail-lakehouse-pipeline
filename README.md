@@ -5,6 +5,7 @@ End-to-end data engineering pipeline for retail data. Postgres OLTP source, Data
 **Status: in progress.** This README reflects the current build state, not a finished system. I update it as each layer gets built, not retroactively at the end.
 
 For the full engineering reasoning behind each layer, see:
+- [`dataset/README.md`](./dataset/README.md), psotgreSQL Database on ghost.build
 - [`dbt/README.md`](./dbt/README.md), transformation layer decisions, the fan-out bug, testing strategy, SCD2 design
 - [`airflow/README.md`](./airflow/README.md), orchestration decisions, Docker issues found and fixed, credential handling
 
