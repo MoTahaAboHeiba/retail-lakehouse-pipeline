@@ -147,7 +147,7 @@ ghost delete my_experiment
 
 - **Python 3.12+**
 - **UV** — [Install UV](https://docs.astral.sh/uv/#installation)
-- **Ghost CLI** — [Install Ghost](https://ghost.build/docs/install)
+- **Ghost CLI** — [Install Ghost](https://ghost.build/docs/#installation)
 - A **PostgreSQL-compatible** database (Ghost, TimescaleDB, Supabase, or local Postgres)
 
 ### 1. Clone and enter project
