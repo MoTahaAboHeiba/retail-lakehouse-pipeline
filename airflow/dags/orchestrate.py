@@ -29,7 +29,7 @@ TERMINAL_STATES = (
 @dag(
     dag_id="orchestrate",
     start_date=datetime(2026, 7, 20),
-    schedule="0 2 * * *",
+    schedule="0 * * * *", # triggered every hour
     catchup=False,
     max_active_runs=1,
     default_args={
