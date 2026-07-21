@@ -59,16 +59,16 @@ Agentic DB/
 **The problem it solves:**
 
 ```
-  Traditional:                 Ghost:
-  Production DB            Production DB
-       |                         |
-       v                         v
+  Traditional:                  Ghost:
+  Production DB               Production DB
+       |                           |
+       v                           v
    Staging DB             Fork — Isolated DB per user
-       |                       |
-       |                 ┌─────┴────────┐
-       |                 │              │
-  Shared, risky         Agent A      Agent B
-                        Own DB       Own DB
+       |                           |
+       |                     ┌─────┴────────┐
+       |                     │              │
+  Shared, risky             Agent A      Agent B
+                            Own DB       Own DB
 ```
 
 **Key capabilities relevant to this project:**
