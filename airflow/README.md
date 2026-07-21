@@ -185,7 +185,7 @@ Fix: the DAG hardcodes container paths only. Orchestration logic never depends o
 
 ---
 
-# Known Limitations (Stated, Not Discovered Live)
+# Known Limitations
 
 - No environment split yet (dev/staging/prod). One Airflow Connection, one target. Flagged as an open item, not yet closed.
 - No deferred/async operators for Databricks job polling. Current polling holds a worker slot for the duration of the ingestion job, which doesn't scale past a small number of concurrent DAG runs.
