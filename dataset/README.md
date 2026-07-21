@@ -7,7 +7,7 @@
 
 **walmart_db** is a lightweight, idempotent data ingestion engine that bulk-loads Walmart retail CSV datasets into PostgreSQL. Designed from a **Data Engineer's mindset** — incremental loads, schema-as-code, `COPY`-based ingestion, and zero side effects on re-runs.
 
-> **Part of a larger ecosystem.** This database is the **source layer** in a broader analytics pipeline. The downstream consumer is **Databricks via [LakeFlow Connect](https://www.databricks.com/product/lakeflow)** — raw data flows from PostgreSQL to Databricks for transformation, enrichment, and serving to dashboards and ML models. This repo focuses only on the ingestion side so you can run it standalone.
+> **Part of a larger ecosystem.** This database is the **source layer** in a broader analytics pipeline. The downstream consumer is **Databricks via [LakeFlow Connect](https://www.databricks.com/product/data-engineering)** — raw data flows from PostgreSQL to Databricks for transformation, enrichment, and serving to dashboards and ML models. This repo focuses only on the ingestion side so you can run it standalone.
 
 ---
 
