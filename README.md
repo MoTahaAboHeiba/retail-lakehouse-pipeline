@@ -2,7 +2,13 @@
 
 End-to-end data engineering pipeline for retail data. Postgres OLTP source, Databricks lakehouse (bronze/silver/gold), dbt for transformation and testing, Airflow for orchestration, S3 as a secondary ingestion path, CI gating on dbt tests.
 
-**Status: in progress.** This README reflects the current build state, not a finished system. I am updating it as each layer gets built, not writing it retroactively at the end.
+**Status: in progress.** This README reflects the current build state, not a finished system. I update it as each layer gets built, not retroactively at the end.
+
+For the full engineering reasoning behind each layer, see:
+- [`dbt/README.md`](./dbt/README.md), transformation layer decisions, the fan-out bug, testing strategy, SCD2 design
+- [`airflow/README.md`](./airflow/README.md), orchestration decisions, Docker issues found and fixed, credential handling
+
+This file stays high-level. The subsystem READMEs carry the depth.
 
 ---
 
@@ -27,7 +33,7 @@ Postgres (OLTP source)
     -> GitHub Actions CI gates every push on dbt test results
 ```
 
-A full architecture diagram will replace this block once the gold layer is built.
+A full architecture diagram will replace this block once the gold layer and CI are both closed.
 
 ## Tech stack and why each piece is there
 
@@ -36,8 +42,8 @@ A full architecture diagram will replace this block once the gold layer is built
 | Databricks (Lakeflow Connect, serverless) | Bronze ingestion | Query-based incremental load using cursor column + primary key. See ingestion note below, this is deliberately not labeled CDC. |
 | dbt Core + dbt-databricks | Silver/gold transformation | Incremental models, SCD2 snapshots, metadata-driven OBT via Jinja. |
 | Airflow (Docker) | Orchestration | Triggers dbt runs and Databricks jobs. No transformation logic lives inside a DAG task. |
-| AWS S3 | Secondary ingestion path | Represents a second source system feeding the same lakehouse, separate from the live OLTP path. |
-| GitHub Actions | CI | Runs dbt tests on every push, blocks merge on failure. |
+| AWS S3 | Secondary ingestion path | Represents a second source system feeding the same lakehouse, separate from the live OLTP path. Not yet built. |
+| GitHub Actions | CI | Runs dbt tests on every push, blocks merge on failure. Not yet built. |
 
 ## Important: ingestion pattern is not CDC
 
@@ -51,23 +57,25 @@ The tradeoff I accepted: this is scheduled polling, not continuous capture, and 
 
 The silver business layer (`obt_business`) is not a hardcoded SELECT with hardcoded joins. It is built from a structured config (table reference, join key, column list per source) that a Jinja for-loop compiles into the SELECT and JOIN clauses at build time. Adding a new source table to this model means adding one config entry, not writing new SQL.
 
-The config references source models through dbt's `ref()`, not hardcoded schema paths. This matters beyond style: hardcoded paths break dbt's dependency graph, and `dbt docs generate` cannot trace lineage through a model that bypasses `ref()`. A config that still hardcodes the table name as a string isn't metadata-driven, it just relocates the same defect into a dict.
+The config references source models through dbt's `ref()`, not hardcoded schema paths, so lineage tracking through `dbt docs generate` survives the abstraction instead of being broken by it. Full reasoning in `dbt/README.md`.
 
 ## Engineering decision: found and fixed a 10x row inflation bug via independent verification
 
 During silver business layer build, `obt_business` produced 300,513 rows against an expected grain of 30,021 (the `order_items` row count). Every `dbt run` and `dbt test` had passed clean, none of it caught this.
 
-Root cause: the model joined `employees` into the OBT on `store_id`. `store_id` is not a unique key on the employees table, a store has many employees, so the join produced a cross-product: every order line was duplicated once per employee at that store. Deeper cause: the orders table has no `employee_id` column at all. The source system does not record which employee handled a given order, so no accurate order-to-employee join is possible with this data. The same defect had already propagated downstream into `fact_orders` through `ref()` lineage before I caught it.
+Root cause: the model joined `employees` into the OBT on `store_id`, which is not a unique key on that table. A store has many employees, so the join produced a cross-product, every order line duplicated once per employee at that store. Deeper cause: the orders table has no `employee_id` column at all, the source system does not record which employee handled a given order, so no accurate order-to-employee join is possible with this data.
 
-Fix: removed the employee join from both models rather than approximating a relationship the data doesn't support (for example, picking one employee per store arbitrarily). Employee is retained as its own dimension, connected to the store dimension in the gold layer (snowflake pattern) instead of to the fact table, since employee's real relationship is to store, not to order. Employee and store each get independent SCD Type 2 timelines, filtered by their own `dbt_valid_from`/`dbt_valid_to` and joined on the `store_id` business key, rather than one shared validity window forced across both.
+Fix: removed the join rather than approximating a relationship the data doesn't support. Employee is retained as its own dimension, connected to the store dimension in gold (snowflake pattern) instead of to the fact table. Full root cause, stakeholder communication, and star schema placement reasoning in `dbt/README.md` and `DECISION_LOG.md`.
 
-This is the standing practice going forward on this project: every new or changed join gets a row count check against its expected grain before being considered done. A green dbt run confirms the model executed. It does not confirm the numbers are right.
+Standing practice this created: every new or changed join gets a row count check against its expected grain before being considered done. A green `dbt run` confirms the model executed. It does not confirm the numbers are right.
 
 ## Known limitations (deliberate, not oversights)
 
 - **Soft/hard deletes are not tracked in bronze.** Source tables have an `is_active` flag that could support deletion tracking, but wiring it up (`deletion_condition`) requires Databricks Asset Bundles or a direct REST API call, since it is not exposed in the ingestion UI. Deferred given the project timeline. Bronze will silently retain deleted source rows until this is implemented.
 - **Query-based connector captures latest state only per run**, not full change history. This has direct downstream impact on SCD2 snapshot completeness and is addressed explicitly in the snapshot design, not ignored.
 - **No employee-to-order relationship exists in the source data.** Employee-level reporting is answerable at the store level (staffing, tenure, role history per store) but not at the individual order level, and the model layer reflects that honestly instead of fabricating a join.
+- **No environment split yet** (dev/staging/prod) in either `profiles.yml` or the Airflow Connection. One target, one connection. Planned before CI is wired up, since CI needs a stateless runner profile regardless.
+- **No CI, no failure alerting, no S3 ingestion path yet.** Listed here instead of silently absent from a features list.
 
 ## Repo structure
 
@@ -85,15 +93,17 @@ retail-lakehouse-pipeline/
 │   │   └── custom_schema.sql
 │   ├── snapshots/
 │   ├── tests/
-│   └── dbt_project.yml
+│   ├── dbt_project.yml
+│   └── README.md
 ├── airflow/
 │   ├── dags/
 │   ├── docker-compose.yml
-│   └── Dockerfile
+│   ├── Dockerfile
+│   └── README.md
 ├── docs/
 │   ├── architecture.md
 │   └── data_dictionary.md
-└── dataset/
+├── dataset/
 │   ├── Data/CSVs
 │   └── ddl/walmart_schema.sql
 └── .github/
@@ -109,10 +119,12 @@ retail-lakehouse-pipeline/
 - Silver technical layer complete: all six source tables modeled as incremental models with merge strategy.
 - Silver business layer complete: metadata-driven `obt_business` built, verified correct on grain after the employee join fix documented above.
 - Generic and singular dbt tests in place across silver technical, business, and fact layers, including direct row count grain checks (not just source-relative checks).
-- Airflow running locally in Docker.
-- Snapshots (SCD2), full gold star schema, CI, and S3 ingestion: not yet built.
+- SCD Type 2 snapshots complete for all five dimensions, verified correct on a second run (no duplication, `dbt_valid_to` populates correctly on superseded rows).
+- Airflow orchestration built and functioning in Docker: DAG sequences the full pipeline (ingestion trigger through gold fact), Databricks Job triggered and polled via SDK before any downstream dbt task runs, credentials handled through an Airflow Connection, dbt isolated in its own virtual environment.
+- **Gold star schema fact table: in progress.** Point-in-time SCD2 join pattern (business key match plus `order_date BETWEEN dbt_valid_from AND dbt_valid_to`) identified as the correct approach, not yet implemented.
+- Not yet built: GitHub Actions CI, AWS S3 secondary ingestion, environment (dev/staging/prod) parameterization.
 
-This section will be replaced by a finished feature list once the build is complete. Until then it stays accurate to what actually exists, not what is planned.
+This section gets replaced by a finished feature list once the build is complete. Until then it stays accurate to what actually exists, not what is planned.
 
 ## What I would change with more time
 
