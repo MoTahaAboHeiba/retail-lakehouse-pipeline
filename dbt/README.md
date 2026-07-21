@@ -155,16 +155,8 @@ dbt/
 
 ## Known limitation inherited from bronze: latest-state-only capture
 
-**Context:** Bronze ingestion (see main project `DECISION_LOG.md` and `PROJECT_TRACKER.md`) uses a query-based connector, not true CDC. Only the latest row state per pipeline run reaches bronze, intermediate changes between runs are lost before they ever reach this layer.
+**Context:** Bronze ingestion (see main project `DECISION_LOG.md`) uses a query-based connector, not true CDC. Only the latest row state per pipeline run reaches bronze, intermediate changes between runs are lost before they ever reach this layer.
 
 **Consequence for this layer:** SCD2 history built in snapshots is only as complete as what bronze delivers. If a dimension attribute changes and reverts between two scheduled ingestion runs, that intermediate state never existed in bronze, so it can never appear in the snapshot history either, this isn't a snapshot logic gap, it's a structural ceiling from two layers upstream. Documented explicitly rather than left for a sharp interviewer to surface first.
 
 ---
-
-# Open Items
-
-- `main.py`, `AI_AGENT_ENTRYPOINT.md`, `PROJECT_REVIEW.md`, and `macros/custom_schema.sql` have no documented purpose in the tracker or decision log yet. Each needs either a one-line entry here or should be removed if unused, an undocumented file in a portfolio repo reads as clutter, not signal.
-- Empty `first_dbt_project_walmart/` directory at project root, separate from `target/compiled/first_dbt_project_walmart/`. If this is a leftover from the nested dbt project restructure (see Airflow README, issue 4), delete it before publishing.
-- Redundancy between `test_obt_grain_check.sql` and `obt_business_grain.sql` unresolved.
-- Gold fact table (`fact_orders.sql`) build in progress: point-in-time SCD2 join pattern (business key match plus `order_date BETWEEN dbt_valid_from AND dbt_valid_to`) not yet implemented as of this writing.
-- Dev/prod target split in `profiles.yml` not yet implemented, flagged across multiple sessions.
