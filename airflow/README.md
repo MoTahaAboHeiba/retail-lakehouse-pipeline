@@ -51,6 +51,7 @@ airflow/
 │   └── orchestrate.py
 ├── config/
 ├── plugins/
+├── .env.example                  # Template — copy to .env and fill credentials
 ├── Dockerfile
 ├── docker-compose.yml
 ├── requirements.txt
