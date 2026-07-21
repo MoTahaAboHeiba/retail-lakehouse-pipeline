@@ -1,7 +1,7 @@
 import os
 import psycopg2
 
-conn = psycopg2.connect("put your POSTGRES CONNECTION STRING")
+conn = psycopg2.connect("PUT YOUR POSTGRES CONNECTION STRING HERE")
 cur = conn.cursor()
 
 csv_files = {
