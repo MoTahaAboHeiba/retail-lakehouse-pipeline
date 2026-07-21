@@ -116,8 +116,8 @@ ghost list
 
 ```
 ID          NAME               STATUS   STORAGE  COMPUTE
-b34obzi7ap  walmart_db         running  655MiB   60.25h
-r4dh1ikwhx  walmart_db_fork    running  670MiB   0.25h    <- read-only fork
+DB1_ID  walmart_db         running  655MiB   60.25h
+BD2_ID  walmart_db_fork    running  670MiB   0.25h    <- read-only fork
 ```
 
 To create your own fork from the original database:
