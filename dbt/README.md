@@ -76,7 +76,6 @@ dbt/
 ├── macros/
 │   └── custom_schema.sql
 ├── dbt_project.yml
-├── packages.yml
 ├── profiles.yml
 └── DECISION_LOG.md
 ```
