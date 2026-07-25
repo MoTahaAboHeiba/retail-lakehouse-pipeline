@@ -1,9 +1,10 @@
-version: 2
+version: 3
 
 models:
   - name: fact_orders
     description: >
-      Gold-layer fact table at order line item grain, sourced from obt_business.
+      Gold-layer fact table at order line item grain, sourced from obt_business,
+      joined against dimension snapshots at order_timestamp for point-in-time SCD2 resolution.
     columns:
       - name: order_item_id
         data_tests:
@@ -12,12 +13,15 @@ models:
       - name: order_id
         data_tests:
           - not_null
-      - name: product_id
+      - name: customer_scd_id
         data_tests:
           - not_null
-      - name: store_id
+      - name: product_scd_id
         data_tests:
           - not_null
-      - name: customer_id
+      - name: store_scd_id
+        data_tests:
+          - not_null
+      - name: order_scd_id
         data_tests:
           - not_null
