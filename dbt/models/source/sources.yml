@@ -9,4 +9,5 @@ sources:
       - name: order_items
       - name: stores
       - name: employees
+      - name: supplier_deliveries_b
 
