@@ -130,3 +130,45 @@ models:
         description: Human-readable store name.
         data_tests:
           - not_null
+  - name: supplier_deliveries_tech
+    description: >
+      Incremental staging model for supplier delivery records sourced from
+      the S3 supplier feed via Auto Loader. Deduplicated on delivery_id,
+      keeping the row from the most recent source file. Unit cost nulls
+      are preserved and flagged, not imputed or excluded.
+    columns:
+      - name: delivery_id
+        description: Primary key for each delivery line, deduplicated on ingestion.
+        data_tests:
+          - not_null
+          - unique
+      - name: product_id
+        description: Product associated with the delivery.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('products_tech')
+                field: product_id
+      - name: supplier_id
+        description: Supplier associated with the delivery.
+        data_tests:
+          - not_null
+      - name: delivery_date
+        description: Date the delivery was recorded.
+        data_tests:
+          - not_null
+      - name: quantity
+        description: Quantity delivered on the line.
+        data_tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              arguments:
+                expression: "> 0"
+      - name: unit_cost
+        description: >
+          Supplier unit cost for the delivered product. Nulls are expected
+          and preserved; see is_unit_cost_missing for explicit tracking.
+          Do not apply not_null here.
+      - name: is_unit_cost_missing
+        description: Boolean flag, true when unit_cost was null in the source feed.
