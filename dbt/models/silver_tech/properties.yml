@@ -154,6 +154,10 @@ models:
         description: Supplier associated with the delivery.
         data_tests:
           - not_null
+      - name: supplier_name
+        description: Supplier display name, carried through from the bronze S3 feed.
+        data_tests:
+          - not_null
       - name: delivery_date
         description: Date the delivery was recorded.
         data_tests:

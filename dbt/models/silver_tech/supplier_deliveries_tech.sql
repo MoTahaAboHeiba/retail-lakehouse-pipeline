@@ -36,6 +36,7 @@ cleaned as (
         cast(delivery_id as string)      as delivery_id,
         cast(product_id as string)       as product_id,
         cast(supplier_id as string)      as supplier_id,
+        cast(supplier_name as string)    as supplier_name,
         cast(delivery_date as date)      as delivery_date,
         cast(quantity_received as int)   as quantity,
         cast(unit_cost as decimal(10,2)) as unit_cost,
@@ -46,5 +47,4 @@ cleaned as (
     where rn = 1
 
 )
-
 select * from cleaned
