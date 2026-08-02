@@ -48,7 +48,7 @@ The gold layer is a galaxy schema (fact constellation), not a single star schema
 | AWS S3 | Secondary ingestion path | Represents a second source system feeding the same lakehouse, distinct from the live OLTP path. Built and scheduled. |
 | GitHub Actions | CI | Runs dbt tests on every push, blocks merge on failure. Scoped as next phase, not yet built. |
 
-## Important: ingestion pattern is not CDC
+## Important: ingestion pattern is not Pure CDC
 
 Databricks Free Edition is serverless-only. True CDC through Lakeflow Connect's PostgreSQL connector requires a continuous classic-compute gateway to consume the write-ahead log through logical replication, and Free Edition cannot provision that gateway.
 
@@ -121,9 +121,6 @@ This section stays accurate to what actually exists and what is actually verifie
 
 ## What I would change with more time
 
-- Add a true incremental state-based selection (`state:modified+`) to the Airflow DAG so a full model set doesn't rebuild on every run regardless of what changed upstream.
-- Add async/deferred polling for the Databricks job trigger instead of a synchronous poll holding a worker slot for the full ingestion duration.
-- Reconcile `eph_employees` sourcing directly from `employees_tech` instead of `obt_business`, currently a deliberate but unclosed inconsistency versus the other four Sales-side ephemeral models.
 - Add persisted `manifest.json`/`run_results.json` artifacts between Airflow runs for real historical run comparison, not just point-in-time Airflow UI visibility.
 
 ## Repo structure
