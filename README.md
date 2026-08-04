@@ -48,7 +48,7 @@ The gold layer is a galaxy schema (fact constellation), not a single star schema
 | AWS S3 | Secondary ingestion path | Represents a second source system feeding the same lakehouse, distinct from the live OLTP path. Built and scheduled. |
 | GitHub Actions | CI | Runs dbt tests on every push, blocks merge on failure. Scoped as next phase, not yet built. |
 
-## Important: ingestion pattern is not Pure CDC
+## Important: ingestion pattern is not CDC
 
 Databricks Free Edition is serverless-only. True CDC through Lakeflow Connect's PostgreSQL connector requires a continuous classic-compute gateway to consume the write-ahead log through logical replication, and Free Edition cannot provision that gateway.
 
