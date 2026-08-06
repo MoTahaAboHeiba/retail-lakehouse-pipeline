@@ -24,7 +24,7 @@ In practice, the current implementation contains two core business facts:
 
 A conformed date spine and supplier reference dimension support these facts across common reporting workflows.
 
-`obt_business` is scoped to feed `fact_orders` only. Sales and Procurement are independent business processes with no shared grain or business event, so `fact_supplier_deliveries` sources directly from `supplier_deliveries_tech` rather than routing through the Sales-side staging table. Forcing both facts through a shared staging layer would create false coupling between two unrelated processes.
+`obt_business` is scoped to feed `fact_orders` only. Sales and Procurement are independent business processes with no shared grain or business event, so `fact_supplier_deliveries` sources directly from `supplier_deliveries_tech` rather than routing through the Sales-side staging table.
 
 ---
 
@@ -48,6 +48,8 @@ A conformed date spine and supplier reference dimension support these facts acro
 
 The fact stores the following business keys and bridge keys:
 
+- `order_id`
+- `order_item_id`
 - `customer_scd_id`
 - `product_scd_id`
 - `store_scd_id`
@@ -62,7 +64,7 @@ order_timestamp BETWEEN dim.dbt_valid_from AND dim.dbt_valid_to
 
 This ensures that each order line is resolved against the dimension version that was valid when the business event happened.
 
-Dimension ephemeral models (`eph_customers`, `eph_products`, `eph_stores`, `eph_orders`) source directly from their corresponding Silver Technical table, not from `obt_business`. Business-key grain dimension prep is kept separate from the line-item grain business layer to avoid unnecessary grain transformations between staging and snapshot.
+Dimension ephemeral models (`eph_customers`, `eph_products`, `eph_stores`, `eph_orders`, `eph_employees`) source directly from their corresponding Silver Technical table.
 
 ### 2. Procurement fact lineage
 
@@ -85,12 +87,6 @@ delivery_amount = quantity * unit_cost
 ```
 
 When `unit_cost` is null, the derived amount remains null and the source missingness is preserved through the `is_unit_cost_missing` flag.
-
-Product resolution in this fact is current-state only, not point-in-time:
-
-```sql
-dim_products.dbt_valid_to = to_date('9999-12-31')
-```
 
 A supplier delivery is a procurement transaction, not a product history event, so it resolves to whatever the product looks like now rather than what it looked like at the moment of delivery. This is the deliberate distinction between how the two facts consume the same shared product dimension.
 
@@ -184,7 +180,7 @@ The Gold layer is governed through schema-level data tests and analytical valida
 - point-in-time correctness across historical dimension joins on `fact_orders`
 - current-state correctness on the procurement-side product join in `fact_supplier_deliveries`
 
-A passing `dbt test` run alone is not treated as sufficient evidence of correctness. Every fact table also carries an independent grain check (row count against its known source grain) and every dimension is independently verified for exactly one active (`dbt_valid_to = 9999-12-31`) version per business key before being considered closed.
+A passing `dbt test` run alone is not treated as sufficient evidence of correctness. Every fact table also carries an independent grain check (row count against its known source grain) and every dimension is independently verified before being considered closed.
 
 ---
 
