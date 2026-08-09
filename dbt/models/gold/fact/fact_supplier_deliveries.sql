@@ -1,7 +1,7 @@
 select
     sd.delivery_id               as delivery_id,
     ds.supplier_id               as supplier_id,
-    dp.dbt_scd_id                as product_scd_id,
+    dp.product_id                as product_id,
     dd.date_id                   as delivery_date_id,
     sd.quantity                  as quantity,
     sd.unit_cost                 as unit_cost,
