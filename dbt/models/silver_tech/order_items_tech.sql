@@ -7,7 +7,16 @@
 
 with source as (
 
-    select *
+    select
+        order_item_id,
+        order_id,
+        product_id,
+        quantity,
+        unit_price,
+        line_amount,
+        created_timestamp,
+        updated_timestamp,
+        is_active
     from {{ source('walmart_databricks', 'order_items') }}
 
     {% if is_incremental() %}
@@ -22,7 +31,15 @@ with source as (
 deduped as (
 
     select
-        *,
+        order_item_id,
+        order_id,
+        product_id,
+        quantity,
+        unit_price,
+        line_amount,
+        created_timestamp,
+        updated_timestamp,
+        is_active,
         row_number() over (
             partition by order_item_id
             order by updated_timestamp desc
@@ -35,7 +52,15 @@ deduped as (
 cleaned as (
 
     select
-        * except (rn),
+        order_item_id,
+        order_id,
+        product_id,
+        quantity,
+        unit_price,
+        line_amount,
+        created_timestamp,
+        updated_timestamp,
+        is_active,
         current_timestamp() as processed_at
 
     from deduped
@@ -43,4 +68,15 @@ cleaned as (
 
 )
 
-select * from cleaned
+select
+    order_item_id,
+    order_id,
+    product_id,
+    quantity,
+    unit_price,
+    line_amount,
+    created_timestamp,
+    updated_timestamp,
+    is_active,
+    processed_at
+from cleaned
