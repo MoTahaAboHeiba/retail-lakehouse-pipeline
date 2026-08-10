@@ -7,7 +7,18 @@
 
 with source as (
 
-    select *
+    select
+        customer_id,
+        first_name,
+        last_name,
+        email,
+        phone,
+        city,
+        province,
+        country,
+        created_timestamp,
+        updated_timestamp,
+        is_active
     from {{ source('walmart_databricks', 'customers') }}
 
     {% if is_incremental() %}
@@ -22,7 +33,17 @@ with source as (
 deduped as (
 
     select
-        *,
+        customer_id,
+        first_name,
+        last_name,
+        email,
+        phone,
+        city,
+        province,
+        country,
+        created_timestamp,
+        updated_timestamp,
+        is_active,
         row_number() over (
             partition by customer_id
             order by updated_timestamp desc
@@ -35,7 +56,17 @@ deduped as (
 cleaned as (
 
     select
-        * except (rn),
+        customer_id,
+        first_name,
+        last_name,
+        email,
+        phone,
+        city,
+        province,
+        country,
+        created_timestamp,
+        updated_timestamp,
+        is_active,
         current_timestamp() as processed_at
 
     from deduped
@@ -43,4 +74,17 @@ cleaned as (
 
 )
 
-select * from cleaned
+select
+    customer_id,
+    first_name,
+    last_name,
+    email,
+    phone,
+    city,
+    province,
+    country,
+    created_timestamp,
+    updated_timestamp,
+    is_active,
+    processed_at
+from cleaned
