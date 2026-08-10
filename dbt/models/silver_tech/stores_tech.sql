@@ -7,7 +7,15 @@
 
 with source as (
 
-    select *
+    select
+        store_id,
+        store_name,
+        city,
+        province,
+        country,
+        created_timestamp,
+        updated_timestamp,
+        is_active
     from {{ source('walmart_databricks', 'stores') }}
 
     {% if is_incremental() %}
@@ -22,7 +30,14 @@ with source as (
 deduped as (
 
     select
-        *,
+        store_id,
+        store_name,
+        city,
+        province,
+        country,
+        created_timestamp,
+        updated_timestamp,
+        is_active,
         row_number() over (
             partition by store_id
             order by updated_timestamp desc
@@ -35,7 +50,14 @@ deduped as (
 cleaned as (
 
     select
-        * except (rn),
+        store_id,
+        store_name,
+        city,
+        province,
+        country,
+        created_timestamp,
+        updated_timestamp,
+        is_active,
         current_timestamp() as processed_at
 
     from deduped
@@ -43,4 +65,14 @@ cleaned as (
 
 )
 
-select * from cleaned
+select
+    store_id,
+    store_name,
+    city,
+    province,
+    country,
+    created_timestamp,
+    updated_timestamp,
+    is_active,
+    processed_at
+from cleaned
