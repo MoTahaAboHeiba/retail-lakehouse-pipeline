@@ -7,7 +7,15 @@
 
 with source as (
 
-    select *
+    select
+        product_id,
+        product_name,
+        category,
+        brand,
+        price,
+        created_timestamp,
+        updated_timestamp,
+        is_active
     from {{ source('walmart_databricks', 'products') }}
 
     {% if is_incremental() %}
@@ -22,7 +30,14 @@ with source as (
 deduped as (
 
     select
-        *,
+        product_id,
+        product_name,
+        category,
+        brand,
+        price,
+        created_timestamp,
+        updated_timestamp,
+        is_active,
         row_number() over (
             partition by product_id
             order by updated_timestamp desc
@@ -35,12 +50,29 @@ deduped as (
 cleaned as (
 
     select
-        * except (rn),
-        current_timestamp() as processed_at 
+        product_id,
+        product_name,
+        category,
+        brand,
+        price,
+        created_timestamp,
+        updated_timestamp,
+        is_active,
+        current_timestamp() as processed_at
 
     from deduped
     where rn = 1
 
 )
 
-select * from cleaned
+select
+    product_id,
+    product_name,
+    category,
+    brand,
+    price,
+    created_timestamp,
+    updated_timestamp,
+    is_active,
+    processed_at
+from cleaned
