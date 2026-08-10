@@ -7,7 +7,17 @@
 
 with source as (
 
-    select *
+    select
+        employee_id,
+        first_name,
+        last_name,
+        email,
+        job_title,
+        salary,
+        store_id,
+        created_timestamp,
+        updated_timestamp,
+        is_active
     from {{ source('walmart_databricks', 'employees') }}
 
     {% if is_incremental() %}
@@ -22,7 +32,16 @@ with source as (
 deduped as (
 
     select
-        *,
+        employee_id,
+        first_name,
+        last_name,
+        email,
+        job_title,
+        salary,
+        store_id,
+        created_timestamp,
+        updated_timestamp,
+        is_active,
         row_number() over (
             partition by employee_id
             order by updated_timestamp desc
@@ -35,7 +54,16 @@ deduped as (
 cleaned as (
 
     select
-        * except (rn),
+        employee_id,
+        first_name,
+        last_name,
+        email,
+        job_title,
+        salary,
+        store_id,
+        created_timestamp,
+        updated_timestamp,
+        is_active,
         current_timestamp() as processed_at
 
     from deduped
@@ -43,4 +71,16 @@ cleaned as (
 
 )
 
-select * from cleaned
+select
+    employee_id,
+    first_name,
+    last_name,
+    email,
+    job_title,
+    salary,
+    store_id,
+    created_timestamp,
+    updated_timestamp,
+    is_active,
+    processed_at
+from cleaned
