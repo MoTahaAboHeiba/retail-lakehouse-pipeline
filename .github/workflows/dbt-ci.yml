@@ -3,7 +3,7 @@ name: dbt CI
 on:
   pull_request:
   push:
-    branches: [master]
+    branches: [master, main]
 
 defaults:
   run:
@@ -51,3 +51,4 @@ jobs:
       - name: Run dbt tests
         run: |
           dbt test --profiles-dir . --profile first_dbt_project_walmart --select "tag:ci" --fail-fast
+

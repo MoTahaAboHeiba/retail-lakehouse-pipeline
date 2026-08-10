@@ -1,0 +1,94 @@
+version: 3
+
+models:
+  - name: fact_orders
+    description: >
+      Gold-layer fact table at order line item grain, sourced from obt_business,
+      joined against dimension snapshots at order_timestamp for point-in-time
+      SCD2 resolution.
+
+    columns:
+      - name: order_item_id
+        data_tests:
+          - not_null
+          - unique
+
+      - name: order_id
+        data_tests:
+          - not_null
+
+      - name: customer_scd_id
+        data_tests:
+          - not_null
+
+      - name: product_scd_id
+        data_tests:
+          - not_null
+
+      - name: store_scd_id
+        data_tests:
+          - not_null
+
+      - name: order_scd_id
+        data_tests:
+          - not_null
+
+  - name: fact_supplier_deliveries
+    description: >
+      Gold-layer supplier delivery fact table at the delivery-line grain.
+      Each row represents one supplier delivery line for a single product
+      delivered on a specific date.
+
+    columns:
+
+      - name: delivery_id
+        description: Business identifier for the supplier delivery line.
+        tests:
+          - unique
+          - not_null
+
+      - name: supplier_id
+        description: Foreign key to the supplier dimension (SCD1).
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_supplier')
+              field: supplier_id
+
+      - name: product_scd_id
+        description: Foreign key to the product SCD2 dimension.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_products')
+              field: dbt_scd_id
+
+      - name: delivery_date_id
+        description: Foreign key to the conformed date dimension.
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_id
+
+      - name: quantity
+        description: Quantity received from the supplier.
+        tests:
+          - not_null
+
+      - name: unit_cost
+        description: >
+          Purchase cost per unit paid to the supplier.
+          May be NULL when the source data does not provide a cost.
+
+      - name: is_unit_cost_missing
+        description: >
+          Indicates whether the original source record contained a missing
+          unit_cost value.
+        tests:
+          - not_null
+
+      - name: delivery_amount
+        description: >
+          Total purchase amount calculated as quantity × unit_cost.
+          Remains NULL whenever unit_cost is NULL.
