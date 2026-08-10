@@ -8,14 +8,7 @@
 
 with source as (
 
-    select
-        delivery_id,
-        product_id,
-        supplier_id,
-        supplier_name,
-        delivery_date,
-        quantity_received,
-        unit_cost
+    select *
     from {{ source('walmart_databricks', 'supplier_deliveries_b') }}
 
     {% if is_incremental() %}
@@ -27,13 +20,7 @@ with source as (
 deduped as (
 
     select
-        delivery_id,
-        product_id,
-        supplier_id,
-        supplier_name,
-        delivery_date,
-        quantity_received,
-        unit_cost,
+        *,
         row_number() over (
             partition by delivery_id
             order by delivery_date desc
@@ -51,7 +38,7 @@ cleaned as (
         cast(supplier_id as string)      as supplier_id,
         cast(supplier_name as string)    as supplier_name,
         cast(delivery_date as date)      as delivery_date,
-        cast(quantity_received as int)  as quantity,
+        cast(quantity_received as int)   as quantity,
         cast(unit_cost as decimal(10,2)) as unit_cost,
         unit_cost is null                as is_unit_cost_missing,
         current_timestamp()              as processed_at
@@ -60,15 +47,4 @@ cleaned as (
     where rn = 1
 
 )
-
-select
-    delivery_id,
-    product_id,
-    supplier_id,
-    supplier_name,
-    delivery_date,
-    quantity,
-    unit_cost,
-    is_unit_cost_missing,
-    processed_at
-from cleaned
+select * from cleaned
