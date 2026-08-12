@@ -37,7 +37,7 @@ jobs:
           import pathlib
           import tomllib
 
-          pyproject_path = pathlib.Path('dbt/pyproject.toml')
+          pyproject_path = pathlib.Path('pyproject.toml')
           if not pyproject_path.exists():
               raise SystemExit('pyproject.toml not found at dbt project root')
 
