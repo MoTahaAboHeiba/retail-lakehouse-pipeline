@@ -1,7 +1,8 @@
 {{
     config(
         materialized='incremental',
-        unique_key='store_id'
+        unique_key='store_id',
+        incremental_strategy='merge'
     )
 }}
 
