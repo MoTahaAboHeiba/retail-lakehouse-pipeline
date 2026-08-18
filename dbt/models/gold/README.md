@@ -28,7 +28,7 @@ BETWEEN dbt_valid_from AND dbt_valid_to
 OR (order_timestamp < key's earliest dbt_valid_from AND dbt_valid_from = that earliest value)
 ```
 
-**Why the fallback:** `dbt_valid_from` is snapshot observation time, not entity creation time. Orders older than a key's first tracked version fall outside every `BETWEEN` window and null-fill silently. Fallback resolves to the earliest known version instead. Computed via precomputed per-key CTE (`MIN(dbt_valid_from) GROUP BY key`), not a correlated subquery — Spark Catalyst doesn't support correlated scalar subqueries in JOIN conditions.
+**Why the fallback:** `dbt_valid_from` is snapshot observation time, not entity creation time. Orders older than a key's first tracked version fall outside every `BETWEEN` window and null-fill silently. Fallback resolves to the earliest known version instead. Computed via precomputed per-key CTE (`MIN(dbt_valid_from) GROUP BY key`), not a correlated subquery
 
 Also carries:
 - `product_id` (natural key) — supports `dim_products_current` relationship
@@ -75,6 +75,10 @@ Grain verified: 500 rows = `COUNT(DISTINCT product_id)` on `dim_products`.
 
 ## Testing
 
-72/72 tests passing (latest run). Every fact carries an independent grain check against source row count. Green tests alone are not accepted as proof — grain and null counts verified directly.
+## Testing
+
+123/123 tests passing (confirmed via direct `dbt test` execution, 03:45 runtime, PASS=123 WARN=0 ERROR=0 SKIP=0). Every fact carries an independent grain check against source row count. Green tests alone are not accepted as proof, grain and null counts verified directly.
+
+Test count is sourced from runtime execution output, not static YAML parsing. An earlier static count of test definitions across schema.yml files returned 88, undercounting tests that only surface at compile/run time. Runtime count is the correct number to cite.
 
 **Open gap:** no direct test coverage on `dim_products` itself (`not_null`/`unique` on `dbt_scd_id`, `product_id`, `dbt_valid_from` not yet added).
