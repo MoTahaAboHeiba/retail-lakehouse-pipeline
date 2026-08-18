@@ -13,6 +13,6 @@ from {{ ref('supplier_deliveries_tech') }} sd
         on sd.supplier_id = ds.supplier_id
     left join {{ ref('dim_products') }} dp
         on sd.product_id = dp.product_id
-        and sd.delivery_date between dp.dbt_valid_from and dp.dbt_valid_to
+        and dbt_valid_to = to_date('9999-12-31')
     left join {{ ref('dim_date') }} dd
         on cast(date_format(sd.delivery_date, 'yyyyMMdd') as int) = dd.date_id
