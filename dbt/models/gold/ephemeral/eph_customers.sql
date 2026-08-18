@@ -10,8 +10,6 @@ SELECT
     customer_country,
     customer_created_timestamp,
     customer_updated_timestamp,
-    customer_is_active,
-    customer_processed_at,
-    CURRENT_TIMESTAMP() AS customer_gold_processed_at
+    customer_is_active
 FROM 
     {{ ref('obt_business') }}

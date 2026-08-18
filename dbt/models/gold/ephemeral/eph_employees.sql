@@ -9,8 +9,6 @@ SELECT
     store_id,
     created_timestamp AS employee_created_timestamp,
     updated_timestamp AS employee_updated_timestamp,
-    is_active AS employee_is_active,
-    processed_at AS employee_processed_at,
-    CURRENT_TIMESTAMP() AS employee_gold_processed_at
+    is_active AS employee_is_active
 FROM 
     {{ ref('employees_tech') }}

@@ -7,8 +7,6 @@ SELECT
     price,
     product_created_timestamp,
     product_updated_timestamp,
-    product_is_active,
-    product_processed_at,
-    CURRENT_TIMESTAMP() AS product_gold_processed_at
+    product_is_active
 FROM 
     {{ ref('obt_business') }}
