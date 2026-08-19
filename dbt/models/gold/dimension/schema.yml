@@ -1,0 +1,66 @@
+version: 3
+
+models:
+  - name: dim_date
+    description: Conformed calendar spine shared across both facts.
+
+    columns:
+      - name: date_id
+        description: Surrogate key, format yyyyMMdd.
+        data_tests: [unique, not_null]
+
+      - name: calendar_date
+        data_tests: [unique, not_null]
+
+      - name: year
+        data_tests: [not_null]
+
+      - name: quarter
+        data_tests: [not_null]
+
+      - name: month
+        data_tests: [not_null]
+
+      - name: day
+        data_tests: [not_null]
+
+      - name: is_weekend
+        data_tests: [not_null]
+
+  - name: dim_supplier
+    description: SCD1 supplier reference, current-state only, no surrogate key.
+
+    columns:
+      - name: supplier_id
+        description: Natural key.
+        data_tests: [unique, not_null]
+
+      - name: supplier_name
+        data_tests: [not_null]
+
+  - name: dim_products_current
+    description: >
+      Current-state outrigger off dim_products, one row per product_id.
+      Relates to fact_supplier_deliveries on dbt_scd_id and to
+      fact_orders on product_id.
+
+    columns:
+      - name: dbt_scd_id
+        description: Matches current-version dbt_scd_id in dim_products.
+        data_tests: [unique, not_null]
+
+      - name: product_id
+        description: Natural key, unique here by construction.
+        data_tests: [unique, not_null]
+
+      - name: product_name
+        data_tests: [not_null]
+
+      - name: category
+        data_tests: [not_null]
+
+      - name: brand
+        data_tests: [not_null]
+
+      - name: price
+        data_tests: [not_null]
