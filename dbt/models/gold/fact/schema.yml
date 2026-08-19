@@ -52,24 +52,27 @@ models:
         tests:
           - not_null
           - relationships:
-              to: ref('dim_supplier')
-              field: supplier_id
+              arguments:
+                to: ref('dim_supplier')
+                field: supplier_id
 
       - name: product_scd_id
         description: Foreign key to the product SCD2 dimension.
         tests:
           - not_null
           - relationships:
-              to: ref('dim_products')
-              field: dbt_scd_id
+              arguments:
+                to: ref('dim_products')
+                field: dbt_scd_id
 
       - name: delivery_date_id
         description: Foreign key to the conformed date dimension.
         tests:
           - not_null
           - relationships:
-              to: ref('dim_date')
-              field: date_id
+              arguments:
+                to: ref('dim_date')
+                field: date_id
 
       - name: quantity
         description: Quantity received from the supplier.
