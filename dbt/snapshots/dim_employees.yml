@@ -8,3 +8,16 @@ snapshots:
       strategy: timestamp
       updated_at: employee_updated_timestamp
       dbt_valid_to_current: "to_date('9999-12-31')"
+    columns:
+      - name: dbt_scd_id
+        tests: [unique, not_null]
+      - name: employee_id
+        tests: [not_null]
+      - name: store_id
+        tests: [not_null]
+      - name: job_title
+        tests: [not_null]
+      - name: salary
+        tests: [not_null]
+      - name: employee_is_active
+        tests: [not_null]
