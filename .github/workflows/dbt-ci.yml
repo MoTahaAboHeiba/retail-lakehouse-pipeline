@@ -36,19 +36,17 @@ jobs:
           python - <<'PY'
           import pathlib
           import tomllib
-
-          pyproject_path = pathlib.Path('dbt/pyproject.toml')
+          pyproject_path = pathlib.Path('pyproject.toml')
           if not pyproject_path.exists():
               raise SystemExit('pyproject.toml not found at dbt project root')
-
           data = tomllib.load(pyproject_path.open('rb'))
           deps = data['project'].get('dependencies', [])
-          pathlib.Path('dbt/requirements-ci.txt').write_text('\n'.join(deps) + '\n')
+          pathlib.Path('requirements-ci.txt').write_text('\n'.join(deps) + '\n')
           PY
-          pip install -r dbt/requirements-ci.txt
+          pip install -r requirements-ci.txt
           pip install dbt-core dbt-databricks
-          dbt deps --profiles-dir dbt --profile first_dbt_project_walmart
+          dbt deps --profiles-dir . --profile first_dbt_project_walmart
 
       - name: Run dbt tests
         run: |
-          dbt test --profiles-dir dbt --profile first_dbt_project_walmart --select "tag:ci" --fail-fast
+          dbt test --profiles-dir . --profile first_dbt_project_walmart --select "tag:ci" --fail-fast
