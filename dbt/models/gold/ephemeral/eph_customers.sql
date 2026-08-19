@@ -8,8 +8,6 @@ SELECT
     customer_city,
     customer_province,
     customer_country,
-    customer_created_timestamp,
-    customer_updated_timestamp,
     customer_is_active
 FROM 
     {{ ref('obt_business') }}
