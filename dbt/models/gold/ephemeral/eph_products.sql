@@ -5,8 +5,6 @@ SELECT
     category,
     brand,
     price,
-    product_created_timestamp,
-    product_updated_timestamp,
     product_is_active
 FROM 
     {{ ref('obt_business') }}
