@@ -6,6 +6,6 @@ walmart_project:
       host: "{{ env_var('DBT_HOST') }}"
       http_path: "{{ env_var('DBT_HTTP_PATH') }}"
       schema: "{{ env_var('DBT_SCHEMA', 'dbt_schema') }}"
-      threads: "{{ env_var('DBT_THREADS', '6') | int }}"
+      threads: "{{ env_var('DBT_THREADS', '4') | int }}"
       token: "{{ env_var('DBT_TOKEN') }}"
   target: dev
