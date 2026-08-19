@@ -9,7 +9,7 @@
 
 End-to-end data engineering pipeline for retail data. Postgres OLTP source, Databricks lakehouse (bronze/silver/gold), dbt for transformation and testing, Airflow for orchestration, AWS S3 as a secondary ingestion path via Auto Loader, CI-gated on dbt tests through GitHub Actions.
 
-**Status: core pipeline built end to end, gold layer under active data validation.** Bronze through silver is complete and verified. Both gold fact tables are built and orchestrated, but the most recent full test run surfaced integrity defects in both. Root cause investigation is in progress, tracked in [`dbt/README.md`](dbt/README.md) and `DECISION_LOG.md`. This README states that plainly instead of hiding it behind a passing test count.
+**Status: core pipeline built end to end, gold layer under active data validation.** Bronze through silver is complete and verified. Both gold fact tables are built and orchestrated, but the most recent full test run surfaced integrity defects in both. Root cause investigation is in progress, tracked in [`dbt/README.md`](dbt/README.md) and `DECISION_LOG.md`.
 
 For the full engineering reasoning behind each layer:
 
@@ -125,12 +125,6 @@ Only with your own Databricks workspace and Postgres instance, this project does
 
 ## Pipeline proof
 
-### CI gate passing
-
-![CI test passed](docs/ci-test-passed.jpg)
-
-GitHub Actions runs the full dbt test suite on every push and blocks merge on failure. Workflow: [`.github/workflows/dbt-ci.yml`](.github/workflows/dbt-ci.yml).
-
 ### dbt lineage
 
 ![dbt data lineage](docs/dbt-data-lineage.jpg)
@@ -155,6 +149,12 @@ Enforced sequential dependency between stages, and parallel task execution withi
 ![Ghost server running](docs/ghost-server-running.jpg)
 
 Postgres instance on Ghost.build, source layer for the pipeline.
+
+### CI gate passing
+
+![CI test passed](docs/ci-test-passed.jpg)
+
+GitHub Actions runs the full dbt test suite on every push and blocks merge on failure. Workflow: [`.github/workflows/dbt-ci.yml`](.github/workflows/dbt-ci.yml).
 
 ## Important: ingestion pattern is not CDC
 
