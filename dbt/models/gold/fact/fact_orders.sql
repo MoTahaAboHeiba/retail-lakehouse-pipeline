@@ -6,6 +6,7 @@
 --  SELECT
 --     ob.order_id,
 --     ob.order_item_id,
+--     ob.product_id,
 --     dc.dbt_scd_id AS customer_scd_id,
 --     dp.dbt_scd_id AS product_scd_id,
 --     ds.dbt_scd_id AS store_scd_id,
@@ -56,6 +57,7 @@ order_floor AS (
 SELECT
     ob.order_id,
     ob.order_item_id,
+    ob.product_id,
     dc.dbt_scd_id AS customer_scd_id,
     dp.dbt_scd_id AS product_scd_id,
     ds.dbt_scd_id AS store_scd_id,
