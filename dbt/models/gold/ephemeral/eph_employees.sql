@@ -7,8 +7,6 @@ SELECT
     job_title,
     salary,
     store_id,
-    created_timestamp AS employee_created_timestamp,
-    updated_timestamp AS employee_updated_timestamp,
     is_active AS employee_is_active
 FROM 
     {{ ref('employees_tech') }}
