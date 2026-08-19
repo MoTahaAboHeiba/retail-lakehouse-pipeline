@@ -5,8 +5,6 @@ SELECT
     category,
     brand,
     price,
-    product_created_timestamp,
-    product_updated_timestamp,
     product_is_active
 FROM {{ ref('dim_products') }}
 WHERE dbt_valid_to = to_date('9999-12-31')
