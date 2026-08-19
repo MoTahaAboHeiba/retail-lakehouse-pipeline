@@ -1,11 +1,11 @@
 walmart_project:
   outputs:
-    dev:
-      type: databricks
-      catalog: "{{ env_var('DATABRICKS_CATALOG', 'walmart') }}"
-      host: "{{ env_var('DATABRICKS_HOST') }}"
-      http_path: "{{ env_var('DATABRICKS_HTTP_PATH') }}"
-      schema: "{{ env_var('DATABRICKS_SCHEMA', 'dbt_schema') }}"
-      threads: "{{ env_var('DBT_THREADS', '1') | int }}"
-      token: "{{ env_var('DATABRICKS_TOKEN') }}"
-  target: dev
+   dev:
+        type: databricks
+        catalog: "{{ env_var('DBT_CATALOG', 'walmart') }}"
+        host: "{{ env_var('DBT_HOST') }}"
+        http_path: "{{ env_var('DBT_HTTP_PATH') }}"
+        schema: "{{ env_var('DBT_SCHEMA', 'dbt_schema') }}"
+        threads: "{{ env_var('DBT_THREADS', '5') | int }}"
+        token: "{{ env_var('DBT_TOKEN') }}"
+    target: dev
