@@ -31,9 +31,9 @@ This file stays high level. The subsystem READMEs carry the depth.
 - [Pipeline proof](#pipeline-proof)
 - [Important: ingestion pattern is not CDC](#important-ingestion-pattern-is-not-cdc)
 - [Engineering decisions](#engineering-decisions)
-- - [Repo structure](#repo-structure)
-- [Known limitations](#known-limitations)
+- [Repo structure](#repo-structure)
 - [Current build state](#current-build-state)
+- [Known limitations](#known-limitations)
 - [What I would change with more time](#what-i-would-change-with-more-time)
 
 
@@ -45,6 +45,8 @@ I built this to close two gaps in my own skill set: dbt (incremental models, sna
 
 This is not a from-scratch architecture idea. It's based on a published retail data engineering tutorial (Postgres to Databricks to dbt to Airflow), and I'm not pretending otherwise. What I control is the engineering decisions on top of that structure, documented here honestly, including every tradeoff, accepted limitation, and bug I found and fixed.
 
+---
+
 ## Architecture
 
 ```
@@ -53,7 +55,7 @@ Postgres (OLTP source)
     -> AWS S3 (secondary ingestion path, Auto Loader) -> Databricks bronze
     -> dbt silver technical layer (per-table incremental models)
     -> dbt silver business layer (metadata-driven One Big Table)
-    -> dbt tests (generic + singular)
+    -> dbt tests (generic + singular + ci)
     -> dbt snapshots (SCD Type 2 dimension history)
     -> dbt gold layer (galaxy schema: two business processes, shared conformed dimensions)
     -> Airflow (Docker) orchestrates the chain end to end
@@ -163,6 +165,8 @@ GitHub Actions runs the full dbt test suite on every push and blocks merge on fa
 
 **Reasoning:** Databricks Free Edition is serverless-only, and true CDC needs a continuous classic-compute gateway to read the write-ahead log, which Free Edition can't provision. The tradeoff: this is scheduled polling, not continuous capture, each run captures only the latest row state. Accounted for explicitly in the snapshot design, not discovered late.
 
+---
+
 ## Engineering decisions
 
 ### Metadata-driven silver business layer
@@ -199,6 +203,7 @@ GitHub Actions runs the full dbt test suite on every push and blocks merge on fa
 
 **Reasoning:** A hardcoded range silently stops covering new data with no error, just missing joins. Deriving it from live source data means the dimension grows with the data instead of needing manual extension.
 
+---
 
 ## Repo structure
 
@@ -244,6 +249,25 @@ retail-lakehouse-pipeline/
         └── dbt-ci.yml
 ```
 
+---
+
+## Current build state
+
+- Postgres source provisioned, 6 tables loaded (customers, stores, products, employees, orders, order_items).
+- Primary bronze ingestion built: query-based connector, cursor column plus primary key per table.
+- Secondary bronze ingestion built: S3 supplier feed via external location, scheduled upsert into a bronze streaming table.
+- Silver technical layer complete: all source tables incremental, including `supplier_deliveries_tech`.
+- Silver business layer complete: `obt_business` verified correct on grain after the fan-out fix.
+- Galaxy schema gold layer built: two independent business processes, shared conformed dimensions only where the relationship is real.
+  - `fact_orders` (sales, order line grain) and `fact_supplier_deliveries` (procurement, delivery line grain).
+  - `dim_date` and `dim_products_current` shared across both; `dim_supplier` (SCD1) and SCD2 dimensions scoped to their owning process. Full reasoning in [`dbt/gold/README.md`](dbt/gold/README.md).
+- SCD2 snapshots complete for Sales-side dimensions, verified correct on a second run. `dim_supplier` deliberately SCD1, no snapshot, no stated business requirement to track history on reference data.
+- Generic and singular tests in place across silver and gold, including direct row count grain checks per fact table.
+- Airflow orchestration built and functioning in Docker, full DAG sequencing, credentials via Airflow Connection.
+- GitHub Actions CI built and passing: dbt tests run on every push, blocks merge on failure.
+- Not yet built: dev/staging/prod parameterization, Power BI reporting layer (in progress, three-page report planned: Sales, Procurement, Workforce).
+
+---
 
 ## Known limitations
 
@@ -255,20 +279,6 @@ retail-lakehouse-pipeline/
 - **No environment split yet** (dev/staging/prod). One target, one connection.
 - **No failure alerting yet.** CI checks run and block merge, but a failure is visible only in the Actions tab, not pushed anywhere.
 
-## Current build state
-
-- Postgres source provisioned, 6 tables loaded (customers, stores, products, employees, orders, order_items).
-- Primary bronze ingestion built: query-based connector, cursor column plus primary key per table.
-- Secondary bronze ingestion built: S3 supplier feed via Auto Loader, scheduled daily.
-- Silver technical layer complete: all source tables incremental, including `supplier_deliveries_tech`.
-- Silver business layer complete: `obt_business` verified correct on grain after the fan-out fix.
-- Generic and singular tests in place across silver and gold, including direct row count grain checks.
-- SCD2 snapshots complete for Sales-side dimensions, verified correct on a second run.
-- Galaxy schema gold layer built: `dim_product`, `dim_supplier`, `dim_date`, `fact_orders`, `fact_supplier_deliveries`.
-- Airflow orchestration built and functioning in Docker, full DAG sequencing, credentials via Airflow Connection.
-- GitHub Actions CI built and passing: full dbt test suite runs on every push, blocks merge on failure.
-- **Active defect, not yet resolved:** the most recent full `dbt test` run (72 tests) surfaced 8 failures concentrated in the gold layer, a `dim_date` column name mismatch, and unresolved SCD2 surrogate keys plus duplicate grain in both fact tables. Root cause in progress, tracked in [`dbt/README.md`](dbt/README.md) and `DECISION_LOG.md`. A green test run isn't treated as proof of correctness anywhere in this project, and a red one isn't hidden from this README either.
-- Not yet built: dev/staging/prod parameterization.
 
 ## What I would change with more time
 
