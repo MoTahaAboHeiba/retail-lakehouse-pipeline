@@ -31,10 +31,11 @@ This file stays high level. The subsystem READMEs carry the depth.
 - [Pipeline proof](#pipeline-proof)
 - [Important: ingestion pattern is not CDC](#important-ingestion-pattern-is-not-cdc)
 - [Engineering decisions](#engineering-decisions)
+- - [Repo structure](#repo-structure)
 - [Known limitations](#known-limitations)
 - [Current build state](#current-build-state)
 - [What I would change with more time](#what-i-would-change-with-more-time)
-- [Repo structure](#repo-structure)
+
 
 ---
 
