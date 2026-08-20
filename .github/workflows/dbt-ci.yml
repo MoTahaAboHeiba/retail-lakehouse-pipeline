@@ -45,7 +45,7 @@ jobs:
           PY
           pip install -r requirements-ci.txt
           pip install dbt-core dbt-databricks
-          dbt deps --profiles-dir . --profile first_dbt_project_walmart
+          dbt deps --profiles-dir . --profile walmart_project
 
       - name: Run dbt tests
         run: |
