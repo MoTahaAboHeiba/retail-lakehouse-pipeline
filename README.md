@@ -198,34 +198,6 @@ GitHub Actions runs the full dbt test suite on every push and blocks merge on fa
 
 **Reasoning:** A hardcoded range silently stops covering new data with no error, just missing joins. Deriving it from live source data means the dimension grows with the data instead of needing manual extension.
 
-## Known limitations
-
-- **Soft/hard deletes aren't tracked in bronze.** An `is_active` flag could support it, wiring it up needs Databricks Asset Bundles or a direct REST call, not exposed in the ingestion UI. Deferred.
-- **Query-based connector captures latest state only per run**, not full change history. Addressed in the snapshot design, not ignored.
-- **No employee-to-order relationship exists in the source data.** Employee reporting is answerable at the store level, not per order.
-- **No true business order date exists.** `created_at` is used as a stated proxy for order date in `fact_orders`. If it lags the real event, downstream time-based reporting inherits that lag.
-- **Supplier margin is an approximate, downstream-derived metric.** No lot or batch traceability links a specific delivery to the units later sold, so margin is a proximity-based approximation, stated as such.
-- **No environment split yet** (dev/staging/prod). One target, one connection.
-- **No failure alerting yet.** CI checks run and block merge, but a failure is visible only in the Actions tab, not pushed anywhere.
-
-## Current build state
-
-- Postgres source provisioned, 6 tables loaded (customers, stores, products, employees, orders, order_items).
-- Primary bronze ingestion built: query-based connector, cursor column plus primary key per table.
-- Secondary bronze ingestion built: S3 supplier feed via Auto Loader, scheduled daily.
-- Silver technical layer complete: all source tables incremental, including `supplier_deliveries_tech`.
-- Silver business layer complete: `obt_business` verified correct on grain after the fan-out fix.
-- Generic and singular tests in place across silver and gold, including direct row count grain checks.
-- SCD2 snapshots complete for Sales-side dimensions, verified correct on a second run.
-- Galaxy schema gold layer built: `dim_product`, `dim_supplier`, `dim_date`, `fact_orders`, `fact_supplier_deliveries`.
-- Airflow orchestration built and functioning in Docker, full DAG sequencing, credentials via Airflow Connection.
-- GitHub Actions CI built and passing: full dbt test suite runs on every push, blocks merge on failure.
-- **Active defect, not yet resolved:** the most recent full `dbt test` run (72 tests) surfaced 8 failures concentrated in the gold layer, a `dim_date` column name mismatch, and unresolved SCD2 surrogate keys plus duplicate grain in both fact tables. Root cause in progress, tracked in [`dbt/README.md`](dbt/README.md) and `DECISION_LOG.md`. A green test run isn't treated as proof of correctness anywhere in this project, and a red one isn't hidden from this README either.
-- Not yet built: dev/staging/prod parameterization.
-
-## What I would change with more time
-
-- Persist `manifest.json`/`run_results.json` between Airflow runs for real historical run comparison, not just point-in-time Airflow UI visibility.
 
 ## Repo structure
 
@@ -270,3 +242,33 @@ retail-lakehouse-pipeline/
     └── workflows/
         └── dbt-ci.yml
 ```
+
+
+## Known limitations
+
+- **Soft/hard deletes aren't tracked in bronze.** An `is_active` flag could support it, wiring it up needs Databricks Asset Bundles or a direct REST call, not exposed in the ingestion UI. Deferred.
+- **Query-based connector captures latest state only per run**, not full change history. Addressed in the snapshot design, not ignored.
+- **No employee-to-order relationship exists in the source data.** Employee reporting is answerable at the store level, not per order.
+- **No true business order date exists.** `created_at` is used as a stated proxy for order date in `fact_orders`. If it lags the real event, downstream time-based reporting inherits that lag.
+- **Supplier margin is an approximate, downstream-derived metric.** No lot or batch traceability links a specific delivery to the units later sold, so margin is a proximity-based approximation, stated as such.
+- **No environment split yet** (dev/staging/prod). One target, one connection.
+- **No failure alerting yet.** CI checks run and block merge, but a failure is visible only in the Actions tab, not pushed anywhere.
+
+## Current build state
+
+- Postgres source provisioned, 6 tables loaded (customers, stores, products, employees, orders, order_items).
+- Primary bronze ingestion built: query-based connector, cursor column plus primary key per table.
+- Secondary bronze ingestion built: S3 supplier feed via Auto Loader, scheduled daily.
+- Silver technical layer complete: all source tables incremental, including `supplier_deliveries_tech`.
+- Silver business layer complete: `obt_business` verified correct on grain after the fan-out fix.
+- Generic and singular tests in place across silver and gold, including direct row count grain checks.
+- SCD2 snapshots complete for Sales-side dimensions, verified correct on a second run.
+- Galaxy schema gold layer built: `dim_product`, `dim_supplier`, `dim_date`, `fact_orders`, `fact_supplier_deliveries`.
+- Airflow orchestration built and functioning in Docker, full DAG sequencing, credentials via Airflow Connection.
+- GitHub Actions CI built and passing: full dbt test suite runs on every push, blocks merge on failure.
+- **Active defect, not yet resolved:** the most recent full `dbt test` run (72 tests) surfaced 8 failures concentrated in the gold layer, a `dim_date` column name mismatch, and unresolved SCD2 surrogate keys plus duplicate grain in both fact tables. Root cause in progress, tracked in [`dbt/README.md`](dbt/README.md) and `DECISION_LOG.md`. A green test run isn't treated as proof of correctness anywhere in this project, and a red one isn't hidden from this README either.
+- Not yet built: dev/staging/prod parameterization.
+
+## What I would change with more time
+
+- Persist `manifest.json`/`run_results.json` between Airflow runs for real historical run comparison, not just point-in-time Airflow UI visibility.
