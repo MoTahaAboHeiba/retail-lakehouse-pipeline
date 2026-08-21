@@ -57,8 +57,8 @@ The gold layer is a galaxy schema, not a single star schema. Two business proces
 
 | Tool | Role | Why |
 |---|---|---|
-| Databricks (Lakeflow Connect, serverless) | Bronze ingestion, primary source | Query-based incremental load, cursor column plus primary key. Not CDC, see below. |
-| Databricks Auto Loader | Bronze ingestion, secondary source | S3 supplier delivery feed. Chosen after `QUOTA_EXCEEDED_EXCEPTION` on the Free Edition ingestion UI, single active pipeline limit. |
+| Databricks (Lakeflow Connect) | Bronze ingestion, primary source | Query-based incremental load, cursor column plus primary key. Not CDC, see below. |
+| Databricks (LakeFlow External Locations) | Bronze ingestion, secondary source | S3 supplier delivery feed. |
 | dbt Core + dbt-databricks | Silver/gold transformation | Incremental models, SCD2 snapshots, metadata-driven OBT, galaxy schema gold layer. |
 | Airflow (Docker) | Orchestration | Triggers dbt runs and Databricks jobs. No transformation logic inside a DAG task. |
 | AWS S3 | Secondary ingestion path | Second source system feeding the same lakehouse, built and scheduled. |
