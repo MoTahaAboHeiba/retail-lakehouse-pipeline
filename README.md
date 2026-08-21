@@ -49,18 +49,7 @@ This is not a from-scratch architecture idea. It's based on a published retail d
 
 ## Architecture
 
-```
-Postgres (OLTP source)
-    -> Databricks bronze (query-based incremental ingestion via Lakeflow Connect)
-    -> AWS S3 (secondary ingestion path, Auto Loader) -> Databricks bronze
-    -> dbt silver technical layer (per-table incremental models)
-    -> dbt silver business layer (metadata-driven One Big Table)
-    -> dbt tests (generic + singular + ci)
-    -> dbt snapshots (SCD Type 2 dimension history)
-    -> dbt gold layer (galaxy schema: two business processes, shared conformed dimensions)
-    -> Airflow (Docker) orchestrates the chain end to end
-    -> GitHub Actions CI gates every push on dbt test results
-```
+![ Project Architecture](docs/Project-Architecture.png).
 
 The gold layer is a galaxy schema, not a single star schema. Two business processes, Sales and Procurement, share conformed dimensions (`dim_product`, `dim_date`) while each keeps its own fact table at its own grain. Full reasoning in [`dbt/README.md`](dbt/README.md).
 
