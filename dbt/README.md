@@ -31,7 +31,7 @@ Snapshots (SCD Type 2, one file per SCD2 dimension)
         └──> Gold Fact: fact_supplier_deliveries (procurement, delivery line grain)
 ```
 
-Two independent business processes, shared conformed dimensions only where the relationship is real. Full reasoning: [`dbt/gold/README.md`](gold/README.md).
+Two independent business processes, shared conformed dimensions only where the relationship is real. Full reasoning: [`dbt/models/gold/README.md`](models/gold/README.md).
 
 ---
 
