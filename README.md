@@ -49,7 +49,7 @@ This is not a from-scratch architecture idea. It's based on a published retail d
 
 ## Architecture
 
-![ Project Architecture](docs/Project-Architecture.png).
+![ Project Architecture](docs/Project-Architecture.png)
 
 The gold layer is a galaxy schema, not a single star schema. Two business processes, Sales and Procurement, share conformed dimensions (`dim_product`, `dim_date`) while each keeps its own fact table at its own grain. Full reasoning in [`dbt/README.md`](dbt/README.md).
 
