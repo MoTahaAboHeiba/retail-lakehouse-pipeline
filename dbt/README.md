@@ -105,7 +105,7 @@ dbt/
 
 **Decision:** Seven models (`customers_tech`, `employees_tech`, `orders_tech`, `order_items_tech`, `products_tech`, `stores_tech`, `supplier_deliveries_tech`), each `materialized='incremental'` with an explicit `unique_key` and merge strategy.
 
-**Engineering reasoning:** This layer does the minimum work: standardize naming, light typing, nothing else. Keeping transformation logic out of this layer means a bug here is isolated to one table's staging pass, not tangled into business logic. Incremental materialization avoids a full rebuild every run, the model only processes what changed since the last run, which matters once table volume stops being trivial.
+**Engineering reasoning:** Incremental materialization avoids a full rebuild every run, the model only processes what changed since the last run, which matters once table volume stops being trivial.
 
 ---
 
