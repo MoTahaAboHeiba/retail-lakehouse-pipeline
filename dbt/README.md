@@ -157,6 +157,24 @@ dbt/
 
 **Independent SCD2 timelines, not a shared one.** Store and employee dimensions each carry their own `dbt_valid_from`/`dbt_valid_to`, joined to each other by business key (`store_id`) and each filtered for validity independently. Forcing a shared validity window across two dimensions that change on different schedules would produce point-in-time joins that are structurally present but temporally wrong, an employee promotion shouldn't force a store record to appear to change too.
 
+## Gold layer: galaxy schema
+
+Two independent business processes, Sales and Procurement, each with its own fact table at its own grain, sharing conformed dimensions only where the relationship is structurally real (`dim_date`, `dim_products_current`). `obt_business` feeds `fact_orders` only, `fact_supplier_deliveries` sources directly from `supplier_deliveries_tech`, there's no shared grain between the two processes to force through one big table.
+
+Full model inventory, the point-in-time join fallback for `fact_orders`, the `dim_products_current` outrigger design and the alternatives rejected for it, and the current SCD strategy per dimension:  [`dbt/models/gold/README.md`](models/gold/README.md).
+
+![data model](../docs/Data-model.jpg)
+
+---
+
+![dbt data lineage](../docs/dbt-data-lineage.jpg)
+
+Full source-to-gold dependency graph, `dbt docs generate`.
+
+![dbt test verification](../docs/dbt-test-verification.jpg)
+
+Test run output, generic and grain tests across silver and gold.
+
 ---
 
 ## Known limitation inherited from bronze: latest-state-only capture
@@ -166,17 +184,3 @@ dbt/
 **Consequence for this layer:** SCD2 history built in snapshots is only as complete as what bronze delivers. If a dimension attribute changes and reverts between two scheduled ingestion runs, that intermediate state never existed in bronze, so it can never appear in the snapshot history either, this isn't a snapshot logic gap, it's a structural ceiling from two layers upstream. Documented explicitly rather than left for a sharp interviewer to surface first.
 
 ---
-
-## Gold layer: galaxy schema
-
-Two independent business processes, Sales and Procurement, each with its own fact table at its own grain, sharing conformed dimensions only where the relationship is structurally real (`dim_date`, `dim_products_current`). `obt_business` feeds `fact_orders` only, `fact_supplier_deliveries` sources directly from `supplier_deliveries_tech`, there's no shared grain between the two processes to force through one big table.
-
-Full model inventory, the point-in-time join fallback for `fact_orders`, the `dim_products_current` outrigger design and the alternatives rejected for it, and the current SCD strategy per dimension: [`dbt/gold/README.md`](gold/README.md).
-
-![dbt data lineage](../docs/dbt-data-lineage.jpg)
-
-Full source-to-gold dependency graph, `dbt docs generate`.
-
-![dbt test verification](../docs/dbt-test-verification.jpg)
-
-Test run output, generic and grain tests across silver and gold.
