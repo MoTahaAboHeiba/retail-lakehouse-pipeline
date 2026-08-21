@@ -29,8 +29,3 @@ Two separate merge operations at two separate layers: the Lakeflow pipeline merg
 **Decision:** The S3 pipeline runs on its own Databricks-managed schedule, outside Airflow's control. A DAG task polls the Databricks Pipelines API before the entire procurement chain that depends on it, `supplier_deliveries_tech` through `dim_supplier` and `fact_supplier_deliveries`, and raises if the latest pipeline update isn't in a completed, current state.
 
 **Reasoning:** Same principle as the primary ingestion path polling in `airflow/README.md`, don't assume a source landed just because it's scheduled to. A pipeline outside your orchestrator's control is a scheduling accident waiting to become a silent gap unless something explicitly checks its terminal state before downstream work depends on it. Gating the full procurement chain, not just the first silver model, means a stale or failed S3 pipeline can't produce a `fact_supplier_deliveries` that looks complete but is quietly built on old data.
-
-## Known limitations
-
-- **Malformed CSVs aren't handled yet.** No schema validation or bad-row quarantine on the incoming monthly file. A malformed file's behavior today is whatever the managed pipeline's default failure mode is, not something explicitly designed for. Flagged here instead of implying resilience that isn't built.
-- **One file per month.** The pipeline re-scans and merges on `delivery_id` rather than depending on new-file detection logic, so cadence is a source-data fact, not an ingestion constraint.
