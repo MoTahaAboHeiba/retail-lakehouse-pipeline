@@ -1,5 +1,5 @@
-{{ config(severity='error') }}
-
+{{ config(severity='error', tags=['ci']) }}
+   
 SELECT *
 FROM {{ ref('obt_business') }}
 WHERE product_name IS NULL
