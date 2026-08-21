@@ -4,7 +4,7 @@
 
 **Decision:** A managed Lakeflow ingestion pipeline, configured through Jobs & Pipelines, connected directly to the S3 bucket as its source.
 
-**Reasoning:** The managed pipeline handles file detection and the bronze-layer merge internally, no custom PySpark or SQL merge logic was written for this layer. Given the ingestion mechanism itself isn't the skill gap this project was built to close (see [`README.md`](README.md), Why This Project Exists), using the platform's managed path here was the right scope call over hand-rolling an ingestion job to prove a point.
+**Reasoning:** The managed pipeline handles file detection and the bronze-layer merge internally, no custom PySpark or SQL merge logic was written for this layer. Given the ingestion mechanism itself isn't the skill gap this project was built to close (see [`../README.md`](README.md), Why This Project Exists), using the platform's managed path here was the right scope call over hand-rolling an ingestion job to prove a point.
 
 ```text
 S3 bucket (monthly supplier_deliveries CSVs)
