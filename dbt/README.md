@@ -76,10 +76,12 @@ dbt/
 │   ├── dim_products.yml
 │   └── dim_stores.yml
 ├── tests/
+│   ├── ci/
+│   │   ├── ci_quality_checks.sql
+│   │   └── ci_quality_gate.sql
 │   ├── grain/
 │   │   ├── obt_business_grain.sql
 │   │   └── fact_orders_grain.sql
-│   ├── ci/
 │   └── singular/
 │       └── test_obt_product_join.sql
 ├── macros/
