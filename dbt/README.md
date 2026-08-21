@@ -1,13 +1,13 @@
 # dbt Transformation Layer
 
-This directory contains the full transformation pipeline for the retail lakehouse project: bronze sources in, gold star schema out. Every layer below is a deliberate architectural decision, not a default. Where a decision traded something off, that tradeoff is stated here, not left for someone else to find.
+This directory contains the full transformation pipeline for the retail lakehouse project: bronze sources in, gold galaxy schema out. Every layer below is a deliberate architectural decision, not a default. Where a decision traded something off, that tradeoff is stated here, not left for someone else to find.
 
 ---
 
 ## Pipeline Flow
 
 ```text
-Bronze (Databricks, via Lakeflow Connect)
+Bronze (Databricks, via Lakeflow Connect + S3 external location)
         │
         ▼
 sources.yml
@@ -25,11 +25,13 @@ Tests (generic + singular, grain verification)
 Gold Ephemeral (dimension prep, inline CTEs only)
         │
         ▼
-Snapshots (SCD Type 2, one file per dimension)
+Snapshots (SCD Type 2, one file per SCD2 dimension)
         │
-        ▼
-Gold Fact (star schema, point-in-time dimension joins)
+        ├──> Gold Fact: fact_orders (sales, order line grain)
+        └──> Gold Fact: fact_supplier_deliveries (procurement, delivery line grain)
 ```
+
+Two independent business processes, shared conformed dimensions only where the relationship is real. Full reasoning: [`dbt/gold/README.md`](gold/README.md).
 
 ---
 
@@ -47,6 +49,7 @@ dbt/
 │   │   ├── orders_tech.sql
 │   │   ├── products_tech.sql
 │   │   ├── stores_tech.sql
+│   │   ├── supplier_deliveries_tech.sql
 │   │   └── properties.yml
 │   ├── silver_business/
 │   │   ├── obt_business.sql
@@ -58,8 +61,13 @@ dbt/
 │       │   ├── eph_orders.sql
 │       │   ├── eph_products.sql
 │       │   └── eph_stores.sql
+│       ├── dimension/
+│       │   ├── dim_date.sql
+│       │   ├── dim_supplier.sql
+│       │   └── dim_products_current.sql
 │       └── fact/
 │           ├── fact_orders.sql
+│           ├── fact_supplier_deliveries.sql
 │           └── schema.yml
 ├── snapshots/
 │   ├── dim_customers.yml
@@ -68,10 +76,11 @@ dbt/
 │   ├── dim_products.yml
 │   └── dim_stores.yml
 ├── tests/
-│   ├── obt_business_grain.sql
-│   ├── fact_orders_grain.sql
+│   ├── grain/
+│   │   ├── obt_business_grain.sql
+│   │   └── fact_orders_grain.sql
+│   ├── ci/
 │   └── singular/
-│       ├── test_obt_grain_check.sql
 │       └── test_obt_product_join.sql
 ├── macros/
 │   └── custom_schema.sql
@@ -94,7 +103,7 @@ dbt/
 
 ## Silver technical layer is one model per source table, incremental
 
-**Decision:** Six models (`customers_tech`, `employees_tech`, `orders_tech`, `order_items_tech`, `products_tech`, `stores_tech`), each `materialized='incremental'` with an explicit `unique_key` and merge strategy.
+**Decision:** Seven models (`customers_tech`, `employees_tech`, `orders_tech`, `order_items_tech`, `products_tech`, `stores_tech`, `supplier_deliveries_tech`), each `materialized='incremental'` with an explicit `unique_key` and merge strategy.
 
 **Engineering reasoning:** This layer does the minimum work: standardize naming, light typing, nothing else. Keeping transformation logic out of this layer means a bug here is isolated to one table's staging pass, not tangled into business logic. Incremental materialization avoids a full rebuild every run, the model only processes what changed since the last run, which matters once table volume stops being trivial.
 
@@ -104,7 +113,7 @@ dbt/
 
 **Decision:** `obt_business.sql` does not contain a hand-written SELECT with hardcoded JOIN clauses. It's built from a structured config (table ref, alias, join key, column list) consumed by a Jinja for-loop that generates the SELECT and JOIN logic at compile time.
 
-**Engineering reasoning:** A hardcoded OBT means adding a 7th source table is a new SQL block written by hand, with every prior join re-verified for correctness by inspection. A metadata-driven OBT means adding a table is one config entry, and the generation logic that produces every other join also produces this one, so there's no new class of bug introduced by a human writing SQL under time pressure. The config uses `ref()`, not hardcoded schema paths, so lineage tracking survives the abstraction instead of being broken by it. See `DECISION_LOG.md`, 2026-07-13, for the full before/after on this.
+**Engineering reasoning:** A hardcoded OBT means adding a new source table is a new SQL block written by hand, with every prior join re-verified for correctness by inspection. A metadata-driven OBT means adding a table is one config entry, and the generation logic that produces every other join also produces this one, so there's no new class of bug introduced by a human writing SQL under time pressure. The config uses `ref()`, not hardcoded schema paths, so lineage tracking survives the abstraction instead of being broken by it. See `DECISION_LOG.md`, 2026-07-13, for the full before/after on this.
 
 **Known failure mode this doesn't prevent:** metadata-driven doesn't mean bug-proof. See the fan-out decision below, the fix for that bug was removing a bad join from the config, the config generation itself wasn't what broke.
 
@@ -124,11 +133,9 @@ dbt/
 
 ## Testing: generic tests for structure, singular tests for grain
 
-**Decision:** `not_null`, `unique`, and `relationships` tests cover structural integrity (all four FK pairs tested: order_items to products, order_items to orders, orders to customers, orders to stores). Singular SQL tests (`obt_business_grain.sql`, `fact_orders_grain.sql`) independently verify row count against the known source grain (`order_items_tech`).
+**Decision:** `not_null`, `unique`, and `relationships` tests cover structural integrity across silver and gold. Grain tests (`tests/grain/`) independently verify row count against known source grain, one per fact table. Singular tests (`tests/singular/`) cover join-specific edge cases. A subset is tagged `ci` and gates every push, see [CI](../.github/workflows/dbt-ci.yml).
 
 **Engineering reasoning:** Generic tests catch broken keys and orphaned records. They do not catch a join that's technically valid SQL but produces the wrong cardinality, that's exactly what the employee fan-out bug was, structurally clean, numerically wrong. Grain tests exist specifically to catch that class of defect, which generic tests cannot see by design.
-
-**Open item, not yet resolved:** `test_obt_grain_check.sql` (under `tests/singular/`) and `obt_business_grain.sql` (top-level) may be redundant, both appear to verify grain on the same model. Not yet reconciled. Flagged here instead of silently keeping duplicate test coverage that looks intentional but isn't.
 
 ---
 
@@ -140,9 +147,9 @@ dbt/
 
 ---
 
-## Snapshots implement SCD Type 2 declaratively
+## Snapshots implement SCD Type 2 declaratively, except where history isn't a requirement
 
-**Decision:** One snapshot YAML per dimension (`dim_customers`, `dim_employees`, `dim_orders`, `dim_products`, `dim_stores`), timestamp strategy, dbt-managed `dbt_valid_from` / `dbt_valid_to`.
+**Decision:** One snapshot YAML per SCD2 dimension (`dim_customers`, `dim_employees`, `dim_orders`, `dim_products`, `dim_stores`), timestamp strategy, dbt-managed `dbt_valid_from` / `dbt_valid_to`. `dim_supplier` is deliberately excluded, it's SCD1: no stated business requirement to track history on reference-level supplier attributes, so no snapshot machinery is built for it.
 
 **Engineering reasoning:** Manual SCD2 merge logic is typically hundreds of lines of hand-written merge SQL. dbt reduces this to a YAML config per dimension. One file per dimension instead of one combined file, a broken snapshot is isolated to a single file, not buried in a shared one. Verified correct by running each snapshot twice with a changed source value between runs: exactly one active row per key, `dbt_valid_to` populates correctly on the superseded row, no duplication.
 
@@ -154,8 +161,22 @@ dbt/
 
 ## Known limitation inherited from bronze: latest-state-only capture
 
-**Context:** Bronze ingestion (see main project `DECISION_LOG.md`) uses a query-based connector, not true CDC. Only the latest row state per pipeline run reaches bronze, intermediate changes between runs are lost before they ever reach this layer.
+**Context:** Primary bronze ingestion uses a query-based connector, not true CDC. Only the latest row state per pipeline run reaches bronze, intermediate changes between runs are lost before they ever reach this layer.
 
 **Consequence for this layer:** SCD2 history built in snapshots is only as complete as what bronze delivers. If a dimension attribute changes and reverts between two scheduled ingestion runs, that intermediate state never existed in bronze, so it can never appear in the snapshot history either, this isn't a snapshot logic gap, it's a structural ceiling from two layers upstream. Documented explicitly rather than left for a sharp interviewer to surface first.
 
 ---
+
+## Gold layer: galaxy schema
+
+Two independent business processes, Sales and Procurement, each with its own fact table at its own grain, sharing conformed dimensions only where the relationship is structurally real (`dim_date`, `dim_products_current`). `obt_business` feeds `fact_orders` only, `fact_supplier_deliveries` sources directly from `supplier_deliveries_tech`, there's no shared grain between the two processes to force through one big table.
+
+Full model inventory, the point-in-time join fallback for `fact_orders`, the `dim_products_current` outrigger design and the alternatives rejected for it, and the current SCD strategy per dimension: [`dbt/gold/README.md`](gold/README.md).
+
+![dbt data lineage](../docs/dbt-data-lineage.jpg)
+
+Full source-to-gold dependency graph, `dbt docs generate`.
+
+![dbt test verification](../docs/dbt-test-verification.jpg)
+
+Test run output, generic and grain tests across silver and gold.
