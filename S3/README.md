@@ -1,9 +1,5 @@
 # S3 Secondary Ingestion
 
-## Why this path exists
-
-Databricks Free Edition allows a single active Lakeflow ingestion pipeline. The primary path (Postgres via query-based Lakeflow Connect) already uses it. A second, independent source, a monthly supplier delivery feed landing as CSVs in S3, needed its own ingestion route without displacing the primary pipeline. This is a platform constraint, not a design preference, stated here rather than left for a reviewer to wonder why two different ingestion mechanisms exist for what looks like the same problem.
-
 ## Architecture
 
 **Decision:** A managed Lakeflow ingestion pipeline, configured through Jobs & Pipelines, connected directly to the S3 bucket as its source. Not Auto Loader, not a hand-written external-table read.
