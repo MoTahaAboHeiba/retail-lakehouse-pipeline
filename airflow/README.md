@@ -59,7 +59,7 @@ After `dim_date` is built, the DAG forks into two independent branches, Sales an
 
 ![Parallel DAG run](../docs/parallel-dag-run.jpg)
 
-`orchestrate.py`. The DAG forks after `dim_date` into the Sales and Procurement branches, then rejoins at `gold_tests()`.
+`orchestrate_parallel.py`. The DAG forks after `dim_date` into the Sales and Procurement branches, then rejoins at `gold_tests()`.
 
 Observed wall-clock time: roughly 10:51 for the sequential baseline against roughly 6:56 for the parallel run, about a 36% reduction. This is a single observed run on each side, not a stable benchmark. A second sequential baseline run is still needed before this number is defensible as repeatable rather than a one-off. Whether the two branches were contending for the same Databricks SQL warehouse concurrently during that run hasn't been measured, so part of the observed gain could be understated or overstated depending on contention. Both caveats stand until re-measured.
 
@@ -70,7 +70,7 @@ Observed wall-clock time: roughly 10:51 for the sequential baseline against roug
 ```text
 airflow/
 ├── dags/
-│   ├── orchestrate.py                        # Parallel: Sales/Procurement fork after dim_date
+│   ├── orchestrate_parallel.py                        # Parallel: Sales/Procurement fork after dim_date
 │   └── orchestrate_sequential_baseline.py    # Sequential: same pipeline, no fork, for comparison
 ├── config/
 ├── plugins/
@@ -180,19 +180,15 @@ Each of these is a real failure from the build, not a hypothetical. Root cause a
    Cause: `uv venv` creates a Python environment, not a copy of the `uv` binary inside it. Calling `dbt_venv/bin/uv` fails because that binary was never placed there.
    Fix: run `uv pip install --python /opt/airflow/dbt_venv/bin/python dbt-core dbt-databricks` from the environment that already has `uv` installed, targeting the venv's Python directly, instead of expecting `uv` to exist inside the target venv.
 
-3. **The dbt CLI argument order changed in dbt Core 1.11.**
-   Cause: global flags (`--project-dir`, `--profiles-dir`) now must follow the subcommand, not precede it.
-   Fix: use `dbt debug --project-dir ... --profiles-dir ...`, not `dbt --project-dir ... debug`. This applies to every dbt subcommand, not just `debug`.
-
-4. **A nested dbt project caused dbt to load the wrong `dbt_project.yml`.**
+3. **A nested dbt project caused dbt to load the wrong `dbt_project.yml`.**
    Cause: two `dbt_project.yml` files existed at different directory levels in the repo. dbt resolved to the wrong one, producing `No nodes selected` and selector errors like `'silver_tech' does not match any enabled nodes`.
    Fix: flatten the repo to a single dbt root with exactly one active `dbt_project.yml`.
 
-5. **Flattening the project broke package resolution.**
+4. **Flattening the project broke package resolution.**
    Cause: after the restructure, the active project's `dbt_packages` directory was empty, producing `dbt found 1 package(s) specified in packages.yml, but only 0 package(s) installed`.
    Fix: `dbt deps` reinstalls packages against the current project structure. The DAG now runs `dbt deps` as the first task on every execution, not just after a restructure, so this failure class can't recur silently.
 
-6. **Host paths and container paths don't match.**
+5. **Host paths and container paths don't match.**
    Cause: the dbt project resolves to different absolute paths on the host machine versus inside the container (`dbt/` versus `/opt/airflow/dbt`).
    Fix: the DAG hardcodes container paths only. Orchestration logic never depends on the developer's local filesystem layout, so the DAG behaves identically regardless of which machine builds the image.
 
@@ -201,19 +197,13 @@ Each of these is a real failure from the build, not a hypothetical. Root cause a
 ## Known limitations
 
 - **The parallel-versus-sequential comparison is a single observed run on each side**, not a repeated benchmark. A second sequential baseline run is needed before the ~36% figure is defensible as stable.
-- **Resource contention between the Sales and Procurement branches hasn't been measured.** Both branches may hit the same Databricks SQL warehouse concurrently during the parallel run, whether that queued, degraded, or ran clean is unverified.
 - **No environment split yet** (dev/staging/prod). One Airflow connection, one target.
-- **No deferred or async operators for Databricks job polling.** Current polling holds a worker slot for the duration of the ingestion job, which doesn't scale past a small number of concurrent DAG runs.
 - **No dbt state-based selective runs.** Every execution runs the full DAG regardless of what actually changed upstream.
-- **No persisted `manifest.json` or `run_results.json` between runs**, so there's no artifact-based lineage or historical run comparison yet.
 - **No failure alerting configured.** A failed DAG run is visible in the Airflow UI only, not pushed anywhere.
 
 ## Future improvements
 
 - Run a second sequential baseline execution to confirm the ~36% parallel speedup holds, not a one-off result.
-- Measure whether the Sales and Procurement branches contend for the same Databricks SQL warehouse during concurrent execution.
-- Replace manual polling with Databricks deferrable operators to free worker slots during ingestion.
 - Adopt dbt state comparison (`--select state:modified+`) to run only what changed, instead of the full DAG every time.
-- Persist dbt artifacts for lineage tracking and historical run comparison.
-- Add failure alerting through Slack or email.
+- Add failure alerting through email or Telegram chat.
 - Parameterize environments (dev, staging, production) through Airflow variables or per-environment configuration.
