@@ -36,20 +36,32 @@ Gold Ephemeral Models
 Snapshots (SCD Type 2)
         │
         ▼
-Gold Fact Models
+     dim_date
+        │
+   ┌────┴────┐
+   ▼         ▼
+ Sales   Procurement
+   │         │
+   └────┬────┘
+        ▼
+   gold_tests()
 ```
 
 Each arrow is a hard dependency. If a stage fails, nothing downstream of it runs. No dbt task executes against partially ingested or partially tested data.
+
+After `dim_date` is built, the DAG forks into two independent branches, Sales and Procurement, and both rejoin at a single task, `gold_tests()`, which runs the full test suite against both fact tables together before either is considered done. See [Sales and Procurement run as parallel branches after `dim_date`](#sales-and-procurement-run-as-parallel-branches-after-dim_date) below for why.
 
 ### Proof
 
 ![Sequential DAG run](../docs/sequential-dag-run.jpg)
 
-The hard dependency chain above, running. Each stage waits on the prior stage's success.
+`orchestrate_sequential_baseline.py`. Every task, including Sales and Procurement, runs in strict order, no fork.
 
 ![Parallel DAG run](../docs/parallel-dag-run.jpg)
 
-Tasks with no dependency on each other run in parallel within a stage. The DAG only serializes where a real dependency exists.
+`orchestrate.py`. The DAG forks after `dim_date` into the Sales and Procurement branches, then rejoins at `gold_tests()`.
+
+Observed wall-clock time: roughly 10:51 for the sequential baseline against roughly 6:56 for the parallel run, about a 36% reduction. This is a single observed run on each side, not a stable benchmark. A second sequential baseline run is still needed before this number is defensible as repeatable rather than a one-off. Whether the two branches were contending for the same Databricks SQL warehouse concurrently during that run hasn't been measured, so part of the observed gain could be understated or overstated depending on contention. Both caveats stand until re-measured.
 
 ---
 
@@ -58,7 +70,8 @@ Tasks with no dependency on each other run in parallel within a stage. The DAG o
 ```text
 airflow/
 ├── dags/
-│   └── orchestrate.py
+│   ├── orchestrate.py                        # Parallel: Sales/Procurement fork after dim_date
+│   └── orchestrate_sequential_baseline.py    # Sequential: same pipeline, no fork, for comparison
 ├── config/
 ├── plugins/
 ├── .env.example                  # Template — copy to .env and fill in credentials
@@ -96,6 +109,12 @@ Silver Business
         ▼
 Silver Business Tests
 ```
+
+### Sales and Procurement run as parallel branches after `dim_date`
+
+**Decision:** Once `dim_date` is built, the DAG forks into two independent branches, Sales and Procurement, that run concurrently. Both rejoin at a single task, `gold_tests()`, which runs the full test suite against both fact tables together before either is considered done.
+
+**Reasoning:** Sales and Procurement don't depend on each other, only on the shared conformed dimensions built earlier in the chain. Running them sequentially burns wall-clock time enforcing an ordering the data doesn't require. `orchestrate_sequential_baseline.py` exists specifically to produce a real before/after comparison for this, not to assert the benefit without a number behind it, see [Proof](#proof) above for the current result and its caveats.
 
 ### Ingestion runs as a monitored Databricks job, not inline Airflow logic
 
@@ -181,6 +200,8 @@ Each of these is a real failure from the build, not a hypothetical. Root cause a
 
 ## Known limitations
 
+- **The parallel-versus-sequential comparison is a single observed run on each side**, not a repeated benchmark. A second sequential baseline run is needed before the ~36% figure is defensible as stable.
+- **Resource contention between the Sales and Procurement branches hasn't been measured.** Both branches may hit the same Databricks SQL warehouse concurrently during the parallel run, whether that queued, degraded, or ran clean is unverified.
 - **No environment split yet** (dev/staging/prod). One Airflow connection, one target.
 - **No deferred or async operators for Databricks job polling.** Current polling holds a worker slot for the duration of the ingestion job, which doesn't scale past a small number of concurrent DAG runs.
 - **No dbt state-based selective runs.** Every execution runs the full DAG regardless of what actually changed upstream.
@@ -189,6 +210,8 @@ Each of these is a real failure from the build, not a hypothetical. Root cause a
 
 ## Future improvements
 
+- Run a second sequential baseline execution to confirm the ~36% parallel speedup holds, not a one-off result.
+- Measure whether the Sales and Procurement branches contend for the same Databricks SQL warehouse during concurrent execution.
 - Replace manual polling with Databricks deferrable operators to free worker slots during ingestion.
 - Adopt dbt state comparison (`--select state:modified+`) to run only what changed, instead of the full DAG every time.
 - Persist dbt artifacts for lineage tracking and historical run comparison.
