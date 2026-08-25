@@ -1,12 +1,12 @@
-# Airflow Orchestration
+# Airflow orchestration
 
 This directory contains the orchestration layer for the retail lakehouse pipeline.
 
-Airflow does not ingest data and does not transform data. It sequences two systems that already do those jobs correctly on their own: a Databricks Job for ingestion, and dbt for every transformation. The DAG's only responsibility is ordering, dependency enforcement, and failure isolation.
+Airflow doesn't ingest data and doesn't transform data. It sequences two systems that already do those jobs: a Databricks job for ingestion, and dbt for every transformation. The DAG's only job is ordering, dependency enforcement, and failure isolation.
 
 ---
 
-## Pipeline Flow
+## Pipeline flow
 
 ```text
 Databricks Ingestion
@@ -41,9 +41,19 @@ Gold Fact Models
 
 Each arrow is a hard dependency. If a stage fails, nothing downstream of it runs. No dbt task executes against partially ingested or partially tested data.
 
+### Proof
+
+![Sequential DAG run](../docs/sequential-dag-run.jpg)
+
+The hard dependency chain above, running. Each stage waits on the prior stage's success.
+
+![Parallel DAG run](../docs/parallel-dag-run.jpg)
+
+Tasks with no dependency on each other run in parallel within a stage. The DAG only serializes where a real dependency exists.
+
 ---
 
-## Project Structure
+## Project structure
 
 ```text
 airflow/
@@ -51,7 +61,7 @@ airflow/
 │   └── orchestrate.py
 ├── config/
 ├── plugins/
-├── .env.example                  # Template — copy to .env and fill credentials
+├── .env.example                  # Template — copy to .env and fill in credentials
 ├── Dockerfile
 ├── docker-compose.yml
 ├── requirements.txt
@@ -60,23 +70,19 @@ airflow/
 
 ---
 
-# Engineering Decisions
+## Engineering decisions
 
-## Airflow is an orchestrator, not a processing engine
+### Airflow is an orchestrator, not a processing engine
 
-**Decision:** The DAG contains zero SQL and zero transformation logic. It does exactly two things: trigger the Databricks ingestion job, and execute dbt commands in a fixed order.
+**Decision:** The DAG contains no SQL and no transformation logic. It triggers the Databricks ingestion job, then runs dbt commands in a fixed order.
 
-**Engineering reasoning:** Putting transformation logic inside a DAG task duplicates responsibility that dbt already owns, lineage, dependency resolution, testing, and documentation. A DAG task that runs raw SQL against the warehouse has none of that context and becomes an untracked side door into the data model. Keeping Airflow strictly declarative (when something runs) and dbt strictly transformational (how data changes) means a change to business logic only ever happens in one place.
+**Reasoning:** A DAG task that runs raw SQL against the warehouse duplicates work dbt already owns, lineage, dependency resolution, testing, and documentation, without any of that context. Keeping Airflow strictly declarative and dbt strictly transformational means a change to business logic only ever happens in one place.
 
-**Business framing:** Orchestration and transformation are decoupled, so a change to a join or a business rule never requires touching the scheduler, and a change to scheduling never risks touching business logic.
+### `run` and `test` run as separate tasks, not `dbt build`
 
----
+**Decision:** Every layer runs as two tasks: build, then test. `dbt build` would collapse this into fewer tasks, and I rejected it anyway.
 
-## `run` and `test` are separate tasks, not `dbt build`
-
-**Decision:** Every layer executes as two tasks: build, then test. `dbt build` was rejected even though it would collapse this into fewer tasks.
-
-**Engineering reasoning:** `dbt build` reports a single pass/fail for a combined operation. When something fails, I want the Airflow UI to tell me immediately whether the model failed to build or the model built but failed validation, those are different failure classes with different fixes. Collapsing them into one task destroys that signal to save a few DAG nodes.
+**Reasoning:** `dbt build` reports one pass/fail for a combined operation. Splitting the tasks tells you immediately whether a model failed to build or built but failed validation, two different failure classes with two different fixes.
 
 ```text
 Silver Technical
@@ -91,37 +97,27 @@ Silver Business
 Silver Business Tests
 ```
 
-**Business framing:** More tasks, faster root cause. A failed pipeline points at exactly which layer and which failure type broke, instead of requiring someone to dig through logs to find out.
+### Ingestion runs as a monitored Databricks job, not inline Airflow logic
 
----
+**Decision:** Bronze ingestion runs through the Databricks SDK (`WorkspaceClient`) as an external job. Airflow polls the Jobs API until the run reaches a terminal state before any dbt task starts.
 
-## Ingestion runs as a monitored Databricks Job, not inline Airflow logic
+**Reasoning:** Ingestion is compute-heavy and belongs on the compute engine, not inside a scheduler container. Polling for terminal state, instead of firing the job and assuming success, is what actually enforces the dependency, without it, "ingestion runs before transformation" is a scheduling accident, not a guarantee.
 
-**Decision:** Bronze ingestion is triggered through the Databricks SDK (`WorkspaceClient`) as an external job. Airflow polls the Jobs API until the run reaches a terminal state before any dbt task is allowed to start.
+### Credentials live in an Airflow connection, not in code
 
-**Engineering reasoning:** Ingestion is compute-heavy and belongs on the compute engine, not inside a scheduler container. Reimplementing ingestion logic inside Airflow would mean maintaining the same logic in two places. Polling for terminal state, rather than firing the job and assuming success, is what actually enforces the dependency. Without it, "ingestion runs before transformation" is a scheduling accident, not a guarantee.
-
-**Business framing:** Transformations never run against a half-loaded bronze layer, this closes off a whole category of silent, hard-to-diagnose data quality issues downstream.
-
----
-
-## Credentials live in an Airflow Connection, not in code
-
-**Decision:** Databricks credentials are stored as an Airflow Connection and retrieved at runtime:
+**Decision:** Databricks credentials are stored as an Airflow connection and retrieved at runtime:
 
 ```python
 conn = BaseHook.get_connection("databricks_default")
 ```
 
-**Engineering reasoning:** Hardcoded credentials in a DAG file mean the DAG cannot move between environments without editing code, and credentials end up in version control history whether or not anyone intends it to happen. A Connection object is environment-scoped, the same DAG code runs against dev or prod credentials depending on where it's deployed.
-
-**Business framing:** No environment-specific forks of the same pipeline logic, and no credential exposure risk from committed code.
+**Reasoning:** Hardcoded credentials in a DAG file mean the DAG can't move between environments without editing code, and they end up in version control history whether or not anyone intends that. A connection object is environment-scoped, so the same DAG code runs against dev or prod credentials depending on where it's deployed.
 
 ---
 
-# Docker Layout
+## Docker layout
 
-The dbt project is mounted into the container as a volume. It is not copied into the image at build time.
+The dbt project is mounted into the container as a volume, not copied into the image at build time.
 
 ```text
 Host
@@ -138,11 +134,9 @@ Container
 └── dbt
 ```
 
-**Engineering reasoning:** A mounted volume means SQL, macro, and snapshot changes are visible inside the container the moment they're saved, no rebuild required. The image only needs rebuilding when Python dependencies change, which is a meaningfully rarer event than a model change during active development.
+A mounted volume means SQL, macro, and snapshot changes appear inside the container as soon as you save them, no rebuild required. The image only needs a rebuild when Python dependencies change, which happens far less often than a model change during active development.
 
----
-
-## dbt runs in its own virtual environment, isolated from Airflow's
+### dbt runs in its own virtual environment, isolated from Airflow's
 
 ```text
 /opt/airflow/dbt_venv
@@ -150,53 +144,53 @@ Container
 
 Every dbt task calls `/opt/airflow/dbt_venv/bin/dbt` directly, never the Airflow container's default Python.
 
-**Engineering reasoning:** Airflow and dbt are both Python applications with independent, frequently conflicting dependency trees (provider packages vs. adapter packages). Installing dbt into Airflow's environment is asking for a dependency resolution failure the moment either project updates a pinned version. A dedicated venv means each tool's dependencies are resolved independently, in the same container, without fighting each other.
+Airflow and dbt are both Python apps with independent, frequently conflicting dependency trees, provider packages against adapter packages. Installing dbt into Airflow's environment risks a dependency resolution failure the moment either project updates a pinned version. A dedicated venv resolves each tool's dependencies independently, in the same container, without the two fighting each other.
 
 ---
 
-# Issues Found and Fixed
+## Issues found and fixed
 
-Each of these was a real failure during the build, not a hypothetical. Root cause and fix only, no narrative.
+Each of these is a real failure from the build, not a hypothetical. Root cause and fix only, no narrative.
 
-**1. Docker volume mount overwrote the dbt virtual environment**
-Cause: the venv was created inside the image at the same path where the project volume later got mounted, so the mount silently replaced it at container start.
-Symptom: `/opt/airflow/dbt_venv/bin/dbt: No such file or directory`, which reads like a failed install but isn't.
-Fix: create the venv at a path outside the mounted project directory so the volume mount can never overwrite it.
+1. **Docker volume mount overwrote the dbt virtual environment.**
+   Cause: the venv was created inside the image at the same path where the project volume later got mounted, so the mount silently replaced it at container start.
+   Symptom: `/opt/airflow/dbt_venv/bin/dbt: No such file or directory`, which reads like a failed install but isn't.
+   Fix: create the venv at a path outside the mounted project directory, so the volume mount can't overwrite it.
 
-**2. `uv` used to install into a venv that didn't contain `uv`**
-Cause: `uv venv` creates a Python environment, not a copy of the `uv` binary inside it. Calling `dbt_venv/bin/uv` fails because that binary was never placed there.
-Fix: run `uv pip install --python /opt/airflow/dbt_venv/bin/python dbt-core dbt-databricks` from the environment that already has `uv` installed, targeting the venv's Python explicitly, instead of expecting `uv` to exist inside the target venv.
+2. **`uv` tried to install into a venv that didn't contain `uv`.**
+   Cause: `uv venv` creates a Python environment, not a copy of the `uv` binary inside it. Calling `dbt_venv/bin/uv` fails because that binary was never placed there.
+   Fix: run `uv pip install --python /opt/airflow/dbt_venv/bin/python dbt-core dbt-databricks` from the environment that already has `uv` installed, targeting the venv's Python directly, instead of expecting `uv` to exist inside the target venv.
 
-**3. dbt CLI argument order changed in dbt Core 1.11**
-Cause: global flags (`--project-dir`, `--profiles-dir`) now must follow the subcommand, not precede it.
-Fix: `dbt debug --project-dir ... --profiles-dir ...` instead of `dbt --project-dir ... debug`. Applies to every dbt subcommand, not just `debug`.
+3. **The dbt CLI argument order changed in dbt Core 1.11.**
+   Cause: global flags (`--project-dir`, `--profiles-dir`) now must follow the subcommand, not precede it.
+   Fix: use `dbt debug --project-dir ... --profiles-dir ...`, not `dbt --project-dir ... debug`. This applies to every dbt subcommand, not just `debug`.
 
-**4. Nested dbt project caused dbt to load the wrong `dbt_project.yml`**
-Cause: two `dbt_project.yml` files existed at different directory levels in the repo. dbt resolved to the wrong one, producing `No nodes selected` and selector errors like `'silver_tech' does not match any enabled nodes`.
-Fix: flattened the repo to a single dbt root with exactly one active `dbt_project.yml`.
+4. **A nested dbt project caused dbt to load the wrong `dbt_project.yml`.**
+   Cause: two `dbt_project.yml` files existed at different directory levels in the repo. dbt resolved to the wrong one, producing `No nodes selected` and selector errors like `'silver_tech' does not match any enabled nodes`.
+   Fix: flatten the repo to a single dbt root with exactly one active `dbt_project.yml`.
 
-**5. Flattening the project broke package resolution**
-Cause: after the restructure, the active project no longer had its `dbt_packages` directory populated, producing `dbt found 1 package(s) specified in packages.yml, but only 0 package(s) installed`.
-Fix: `dbt deps` reinstalls packages against the current project structure. The DAG now runs `dbt deps` as the first task on every execution, not just after a restructure, so this class of failure can't reoccur silently.
+5. **Flattening the project broke package resolution.**
+   Cause: after the restructure, the active project's `dbt_packages` directory was empty, producing `dbt found 1 package(s) specified in packages.yml, but only 0 package(s) installed`.
+   Fix: `dbt deps` reinstalls packages against the current project structure. The DAG now runs `dbt deps` as the first task on every execution, not just after a restructure, so this failure class can't recur silently.
 
-**6. Host paths and container paths are not the same paths**
-Cause: the dbt project resolves to different absolute paths on the host machine versus inside the container (`dbt/` vs `/opt/airflow/dbt`).
-Fix: the DAG hardcodes container paths only. Orchestration logic never depends on the developer's local filesystem layout, which also means the DAG behaves identically regardless of which machine builds the image.
+6. **Host paths and container paths don't match.**
+   Cause: the dbt project resolves to different absolute paths on the host machine versus inside the container (`dbt/` versus `/opt/airflow/dbt`).
+   Fix: the DAG hardcodes container paths only. Orchestration logic never depends on the developer's local filesystem layout, so the DAG behaves identically regardless of which machine builds the image.
 
 ---
 
-# Known Limitations
+## Known limitations
 
-- No environment split yet (dev/staging/prod). One Airflow Connection, one target. Flagged as an open item, not yet closed.
-- No deferred/async operators for Databricks job polling. Current polling holds a worker slot for the duration of the ingestion job, which doesn't scale past a small number of concurrent DAG runs.
-- No dbt state-based selective runs. Every execution runs the full DAG regardless of what actually changed upstream.
-- No persisted `manifest.json` / `run_results.json` between runs, so there's no artifact-based lineage or historical run comparison yet.
-- No failure alerting configured. A failed DAG run is visible in the Airflow UI only, not pushed anywhere.
+- **No environment split yet** (dev/staging/prod). One Airflow connection, one target.
+- **No deferred or async operators for Databricks job polling.** Current polling holds a worker slot for the duration of the ingestion job, which doesn't scale past a small number of concurrent DAG runs.
+- **No dbt state-based selective runs.** Every execution runs the full DAG regardless of what actually changed upstream.
+- **No persisted `manifest.json` or `run_results.json` between runs**, so there's no artifact-based lineage or historical run comparison yet.
+- **No failure alerting configured.** A failed DAG run is visible in the Airflow UI only, not pushed anywhere.
 
-# Future Improvements
+## Future improvements
 
 - Replace manual polling with Databricks deferrable operators to free worker slots during ingestion.
-- Adopt dbt state comparison (`--select state:modified+`) to run only what changed instead of the full DAG every time.
+- Adopt dbt state comparison (`--select state:modified+`) to run only what changed, instead of the full DAG every time.
 - Persist dbt artifacts for lineage tracking and historical run comparison.
-- Add failure alerting (Slack or email).
-- Parameterize environments (dev, staging, production) through Airflow Variables or per-environment configuration, closing the limitation above.
+- Add failure alerting through Slack or email.
+- Parameterize environments (dev, staging, production) through Airflow variables or per-environment configuration.
