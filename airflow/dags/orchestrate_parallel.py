@@ -1,10 +1,14 @@
 import logging
 import os
+import smtplib
 import time
 from datetime import datetime, timedelta, timezone
+from email.mime.text import MIMEText
 
+import requests
 from airflow.decorators import dag, task
 from airflow.hooks.base import BaseHook
+from airflow.models import Variable
 from databricks.sdk import WorkspaceClient
 from databricks.sdk.service.jobs import RunLifeCycleState, RunResultState
 
@@ -30,6 +34,102 @@ TERMINAL_STATES = (
     RunLifeCycleState.INTERNAL_ERROR,
 )
 
+# Failure alerting
+#
+# Config is read from Airflow Variables/Connections at call time, inside the
+# callback. Top-level Variable.get() calls run on
+# every DAG file parse (scheduler heartbeat), not just at execution, and add
+# unnecessary metadata DB load. Resolving config lazily avoids that.
+#
+# Required Airflow Variables:
+#   telegram_bot_token   - Telegram bot token from BotFather
+#   telegram_chat_id     - target chat id (user, group, or channel)
+#   alert_email_to       - recipient email address for failure alerts
+#
+# Required Airflow Connection:
+#   gmail_smtp           - conn_type=smtp/generic, login=<gmail address>,
+#                           password=<Gmail App Password, not account password>,
+#                           host=smtp.gmail.com (optional, defaults below),
+#                           port=465 (optional, defaults below)
+
+
+def _send_telegram(message: str) -> None:
+    bot_token = Variable.get("telegram_bot_token", default_var=None)
+    chat_id = Variable.get("telegram_chat_id", default_var=None)
+
+    if not bot_token or not chat_id:
+        log.error("Telegram alert skipped: telegram_bot_token or telegram_chat_id not set")
+        return
+
+    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+    try:
+        resp = requests.post(
+            url,
+            json={"chat_id": chat_id, "text": message, "parse_mode": "HTML"},
+            timeout=10,
+        )
+        resp.raise_for_status()
+        log.info("Telegram alert sent")
+    except Exception as e:
+        log.error("Telegram alert failed to send: %s", e)
+
+
+def _send_gmail(subject: str, body: str) -> None:
+    recipient = Variable.get("alert_email_to", default_var=None)
+    if not recipient:
+        log.error("Email alert skipped: alert_email_to not set")
+        return
+
+    try:
+        conn = BaseHook.get_connection("gmail_smtp")
+    except Exception as e:
+        log.error("Email alert skipped: gmail_smtp connection not found (%s)", e)
+        return
+
+    msg = MIMEText(body)
+    msg["Subject"] = subject
+    msg["From"] = conn.login
+    msg["To"] = recipient
+
+    host = conn.host or "smtp.gmail.com"
+    port = conn.port or 465
+
+    try:
+        with smtplib.SMTP_SSL(host, port, timeout=15) as server:
+            server.login(conn.login, conn.password)
+            server.sendmail(conn.login, [recipient], msg.as_string())
+        log.info("Email alert sent to %s", recipient)
+    except Exception as e:
+        log.error("Email alert failed to send: %s", e)
+
+
+def notify_failure(context: dict) -> None:
+    """on_failure_callback. Fires once per task instance, after retries are
+    exhausted (Airflow moves a task to up_for_retry, not failed, between
+    attempts). Sends the same alert to Gmail and Telegram. 
+    """
+    ti = context.get("task_instance")
+    exception = context.get("exception")
+    logical_date = context.get("logical_date") or context.get("execution_date")
+
+    dag_id = ti.dag_id if ti else context.get("dag").dag_id
+    task_id = ti.task_id if ti else "unknown"
+    try_number = ti.try_number if ti else "unknown"
+    log_url = ti.log_url if ti else "unavailable"
+
+    subject = f"[Airflow] {dag_id}.{task_id} FAILED"
+    body = (
+        f"DAG: {dag_id}\n"
+        f"Task: {task_id}\n"
+        f"Try: {try_number}\n"
+        f"Logical date: {logical_date}\n"
+        f"Exception: {exception}\n"
+        f"Log: {log_url}\n"
+    )
+
+    _send_gmail(subject, body)
+    _send_telegram(f"<b>{subject}</b>\n{body}")
+
 
 @dag(
     dag_id="orchestrate_parallel",
@@ -41,46 +141,51 @@ TERMINAL_STATES = (
         "owner": "Mohamed Taha Abo Heiba",
         "retries": 2,
         "retry_delay": timedelta(minutes=1),
+        "on_failure_callback": notify_failure,
     },
     tags=["Databricks", "dbt", "parallel"],
 )
 def orchestrate_parallel():
 
-    @task
+    @task(execution_timeout=timedelta(minutes=45))
     def ingest():
-        """Triggers the Postgres bronze job via query-based incremental connector.
-        This is NOT CDC (Decision #5). Do not rename this back."""
+        """Triggers the Postgres bronze job via incremental connector.
+        execution_timeout=45min is a placeholder. Replace with measured p95 from
+        ws.jobs.list_runs(job_id=...) once you have enough run history.
+        """
         conn = BaseHook.get_connection("databricks_default")
         ws = WorkspaceClient(host=conn.host, token=conn.password)
 
         job_id = int(os.getenv("DATABRICKS_JOB_ID"))
         run = ws.jobs.run_now(job_id=job_id)
-        log.info("Triggered Postgres bronze job %s, run id %s", job_id, run.run_id)
+        run_id = run.run_id
+        log.info("Triggered Postgres bronze job %s, run id %s", job_id, run_id)
 
-        while True:
-            job_run = ws.jobs.get_run(run.run_id)
-            lifecycle = job_run.state.life_cycle_state
-            result = job_run.state.result_state
+        try:
+            while True:
+                job_run = ws.jobs.get_run(run_id)
+                lifecycle = job_run.state.life_cycle_state
+                result = job_run.state.result_state
 
-            if lifecycle in TERMINAL_STATES:
-                if result == RunResultState.SUCCESS:
-                    log.info("Bronze query-based incremental ingestion completed")
-                    return "Bronze ingestion completed"
-                raise RuntimeError(f"Postgres bronze job failed: lifecycle={lifecycle}, result={result}")
+                if lifecycle in TERMINAL_STATES:
+                    if result == RunResultState.SUCCESS:
+                        log.info("Bronze query-based incremental ingestion completed")
+                        return "Bronze ingestion completed"
+                    raise RuntimeError(f"Postgres bronze job failed: lifecycle={lifecycle}, result={result}")
 
-            time.sleep(POLL_INTERVAL)
+                time.sleep(POLL_INTERVAL)
+        except Exception:
+            log.error("ingest() exiting abnormally, cancelling Databricks run %s", run_id)
+            try:
+                ws.jobs.cancel_run(run_id=run_id)
+            except Exception as cancel_err:
+                log.error("Failed to cancel Databricks run %s: %s", run_id, cancel_err)
+            raise
 
-    @task
+    @task(execution_timeout=timedelta(minutes=5))
     def check_s3_pipeline_health():
         """Confirms the S3 Lakeflow Connect pipeline actually ran and succeeded today.
         This does NOT trigger the pipeline, it runs on its own native Databricks schedule.
-        This is the failure-visibility check Airflow was missing entirely before today.
-
-        VERIFY BEFORE TRUSTING: field names below (latest_updates, .state, .creation_time)
-        are from SDK memory, not confirmed against your installed databricks-sdk version.
-        Run a throwaway script that does:
-            print(ws.pipelines.get(pipeline_id=<id>))
-        and confirm these fields exist and mean what this code assumes before relying on it.
         """
         conn = BaseHook.get_connection("databricks_default")
         ws = WorkspaceClient(host=conn.host, token=conn.password)
@@ -124,9 +229,6 @@ def orchestrate_parallel():
 
     @task.bash
     def source_freshness():
-        # Confirm error_after/warn_after are actually configured in sources.yml for
-        # BOTH the Postgres and S3 bronze sources. Without thresholds this task passes
-        # trivially and gives you nothing.
         return f"{DBT_BIN} source freshness {DBT_ARGS}"
 
     @task.bash
@@ -143,7 +245,7 @@ def orchestrate_parallel():
         # This is the sync point both branches depend on before they can fork.
         return f"{DBT_BIN} run {DBT_ARGS} --select dim_date"
 
-    # ---- Sales branch (independent from here) ----
+    #  Sales branch (independent from here) 
 
     @task.bash
     def silver_business():
@@ -163,11 +265,9 @@ def orchestrate_parallel():
 
     @task.bash
     def fact_orders():
-        # Model-name select, not folder select. Folder select would pull in
-        # fact_supplier_deliveries too and defeat the whole point of splitting this.
         return f"{DBT_BIN} run {DBT_ARGS} --select fact_orders"
 
-    # ---- Procurement branch (independent from here) ----
+    # Procurement branch (independent from here) 
 
     @task.bash
     def gold_dim_supplier():
@@ -177,13 +277,11 @@ def orchestrate_parallel():
     def fact_supplier_deliveries():
         return f"{DBT_BIN} run {DBT_ARGS} --select fact_supplier_deliveries"
 
-    # ---- Join point ----
+    # Join point 
 
     @task.bash
     def gold_tests():
-        # Runs after BOTH branches complete. This is the test coverage that was
-        # missing entirely before today, gold layer shipped with zero automated
-        # test enforcement in the DAG.
+        # Runs after BOTH branches complete
         return f"{DBT_BIN} test {DBT_ARGS} --select gold"
 
     ingest_t = ingest()
