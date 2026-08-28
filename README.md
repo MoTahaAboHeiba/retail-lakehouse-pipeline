@@ -57,7 +57,7 @@ The gold layer is a galaxy schema, not a single star schema. Two business proces
 
 | Tool | Role | Why |
 |---|---|---|
-| Databricks (Lakeflow Connect) | Bronze ingestion, primary source | Query-based incremental load, cursor column plus primary key. Not CDC, see below. |
+| Databricks (Lakeflow Connect) | Bronze ingestion, primary source |  incremental load, cursor column plus primary key. Not CDC, see below. |
 | Databricks (LakeFlow External Locations) | Bronze ingestion, secondary source | S3 supplier delivery feed. |
 | dbt Core + dbt-databricks | Silver/gold transformation | Incremental models, SCD2 snapshots, metadata-driven OBT, galaxy schema gold layer. |
 | Airflow (Docker) | Orchestration | Triggers dbt runs and Databricks jobs. No transformation logic inside a DAG task. |
@@ -85,7 +85,7 @@ python load_data.py           # loads all 6 CSVs, idempotent
 
 ### 2. Connect Databricks to both sources
 
-Primary path: query-based Lakeflow Connect against Postgres from step 1. Secondary path: Auto Loader against the S3 supplier feed. Full steps: [`S3/README.md`](S3/README.md)
+Primary path:   Lakeflow Connect against Postgres from step 1. Secondary path: Auto Loader against the S3 supplier feed. Full steps: [`S3/README.md`](S3/README.md)
 
 ### 3. Build the transformation layer
 
@@ -150,7 +150,7 @@ GitHub Actions runs the full dbt test suite on every push and blocks merge on fa
 
 ## Important: ingestion pattern is not CDC
 
-**Decision:** Bronze ingestion uses Lakeflow Connect's query-based connector, cursor column plus primary key per table, not true CDC.
+**Decision:** Bronze ingestion uses Lakeflow Connect's  connector, cursor column plus primary key per table, not true CDC.
 
 **Reasoning:** Databricks Free Edition is serverless-only, and true CDC needs a continuous classic-compute gateway to read the write-ahead log, which Free Edition can't provision. The tradeoff: this is scheduled polling, not continuous capture, each run captures only the latest row state. Accounted for explicitly in the snapshot design, not discovered late.
 
@@ -243,7 +243,7 @@ retail-lakehouse-pipeline/
 ## Current build state
 
 - Postgres source provisioned, 6 tables loaded (customers, stores, products, employees, orders, order_items).
-- Primary bronze ingestion built: query-based connector, cursor column plus primary key per table.
+- Primary bronze ingestion built:  connector, cursor column plus primary key per table.
 - Secondary bronze ingestion built: S3 supplier feed via external location, scheduled upsert into a bronze streaming table.
 - Silver technical layer complete: all source tables incremental, including `supplier_deliveries_tech`.
 - Silver business layer complete: `obt_business` verified correct on grain after the fan-out fix.
@@ -261,7 +261,7 @@ retail-lakehouse-pipeline/
 ## Known limitations
 
 - **Soft/hard deletes aren't tracked in bronze.** An `is_active` flag could support it, wiring it up needs Databricks Asset Bundles or a direct REST call, not exposed in the ingestion UI. Deferred.
-- **Query-based connector captures latest state only per run**, not full change history. Addressed in the snapshot design, not ignored.
+- ** connector captures latest state only per run**, not full change history. Addressed in the snapshot design, not ignored.
 - **No employee-to-order relationship exists in the source data.** Employee reporting is answerable at the store level, not per order.
 - **No true business order date exists.** `created_at` is used as a stated proxy for order date in `fact_orders`. If it lags the real event, downstream time-based reporting inherits that lag.
 - **Supplier margin is an approximate, downstream-derived metric.** No lot or batch traceability links a specific delivery to the units later sold, so margin is a proximity-based approximation, stated as such.
