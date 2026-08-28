@@ -8,5 +8,6 @@ SELECT
     salary,
     store_id,
     is_active AS employee_is_active
+    updated_timestamp AS employee_updated_timestamp
 FROM 
     {{ ref('employees_tech') }}
