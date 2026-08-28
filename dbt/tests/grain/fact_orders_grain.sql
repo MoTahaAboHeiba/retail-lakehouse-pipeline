@@ -1,4 +1,4 @@
-{{ config(severity='error', tags=['ci']) }}
+{{ config(severity='error') }}
 
 SELECT
     fo.fo_count
