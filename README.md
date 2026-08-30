@@ -48,9 +48,9 @@ I built this to close a real gap in my own skill set: dbt, specifically incremen
 
 ![Project architecture](docs/Project-Architecture.png)
 
-Source systems (Postgres, S3) land in bronze, get cleaned into a silver layer built around one wide business table, and roll up into a gold layer shaped as a galaxy schema, not a single star schema. Two business processes, Sales and Procurement, share conformed dimensions (`dim_product`, `dim_date`) while each keeps its own fact table at its own grain. Full reasoning in [`dbt/README.md`](dbt/README.md).
+Source systems (Postgres, S3) land in bronze, get cleaned into a silver layer built around one wide business table, and roll up into a gold layer shaped as a galaxy schema, not a single star schema. Two business processes, Sales and Supplies, share conformed dimensions (`dim_product`, `dim_date`) while each keeps its own fact table at its own grain. Full reasoning in [`dbt/README.md`](dbt/README.md).
 
-On top of gold sits the consumption layer. A Databricks Genie Agent answers ad-hoc, natural-language questions straight against the gold tables, for the questions a fixed report can't anticipate. A three-page Power BI report (Sales, Procurement, Workforce) covers the recurring, known-shape reporting need. The two aren't redundant: one handles questions nobody wrote a query for yet, the other handles the questions everyone asks every week.
+On top of gold sits the consumption layer. A Databricks Genie Agent answers ad-hoc, natural-language questions straight against the gold tables, for the questions a fixed report can't anticipate. A three-page Power BI report (Sales, Supplies, Workforce) covers the recurring, known-shape reporting need. The two aren't redundant: one handles questions nobody wrote a query for yet, the other handles the questions everyone asks every week.
 
 Airflow, running in Docker, orchestrates the whole chain and routes failure alerts to both Gmail and Telegram, so a broken run is visible somewhere a person actually checks, not just in the Airflow UI.
 
@@ -64,7 +64,7 @@ Airflow, running in Docker, orchestrates the whole chain and routes failure aler
 | Airflow (Docker) | Orchestration | Triggers dbt runs and Databricks jobs. No transformation logic inside a DAG task. |
 | AWS S3 | Secondary ingestion path | Second source system feeding the same lakehouse, built and scheduled. |
 | Databricks Genie Agent | Ad-hoc consumption | Natural-language queries against the gold layer for business users, without waiting on a new report page. |
-| Power BI | Scheduled consumption | Three-page report (Sales, Procurement, Workforce) for the recurring reporting need. |
+| Power BI | Scheduled consumption | Three-page report (Sales, Supplies, Workforce) for the recurring reporting need. |
 | Gmail and Telegram (via Airflow) | Failure alerting | A DAG failure notifies two channels, not one, so it doesn't depend on a single person watching a single inbox. |
 | GitHub Actions | CI | Runs the full dbt test suite on every push, blocks merge on failure. Built and passing. |
 
@@ -163,7 +163,7 @@ A natural-language question answered directly against the gold layer, no new rep
 
 ![Workforce page](docs/Workforce.jpg)
 
-One of the three pages (Sales, Procurement, Workforce) built on the gold layer.
+One of the three pages (Sales, Supplies, Workforce) built on the gold layer.
 
 ### Secondary ingestion (S3)
 
@@ -211,9 +211,9 @@ GitHub Actions runs the full dbt test suite on every push and blocks merge on fa
 
 ### `dim_product`, shared but not fully conformed
 
-**Decision:** Sales resolves `dim_product` point-in-time via SCD2. Procurement resolves to the current record only.
+**Decision:** Sales resolves `dim_product` point-in-time via SCD2. Supplies resolves to the current record only.
 
-**Reasoning:** A supplier delivery is a procurement transaction, not a product history event. Treating procurement cost changes as SCD2-worthy product history would conflate two different questions, what a product is versus what it cost to acquire, into one timeline.
+**Reasoning:** A supplier delivery is a Supplies transaction, not a product history event. Treating Supplies cost changes as SCD2-worthy product history would conflate two different questions, what a product is versus what it cost to acquire, into one timeline.
 
 ### `dim_supplier`, SCD1, no surrogate key
 
@@ -289,13 +289,13 @@ retail-lakehouse-pipeline/
 - Silver technical layer complete: all source tables incremental, including `supplier_deliveries_tech`.
 - Silver business layer complete: `obt_business` verified correct on grain after the fan-out fix.
 - Galaxy schema gold layer built: two independent business processes, shared conformed dimensions only where the relationship is real.
-  - `fact_orders` (sales, order line grain) and `fact_supplier_deliveries` (procurement, delivery line grain).
+  - `fact_orders` (sales, order line grain) and `fact_supplier_deliveries` (Supplies, delivery line grain).
   - `dim_date` and `dim_products_current` shared across both; `dim_supplier` (SCD1) and SCD2 dimensions scoped to their owning process. Full reasoning in [`dbt/gold/README.md`](dbt/gold/README.md).
 - SCD2 snapshots complete for Sales-side dimensions, verified correct on a second run. `dim_supplier` deliberately SCD1, no snapshot, no stated business requirement to track history on reference data.
 - Generic and singular tests in place across silver and gold, including direct row count grain checks per fact table.
 - Airflow orchestration built and functioning in Docker, full DAG sequencing, credentials via Airflow Connection.
 - Airflow failure alerting built: task failures push to both Gmail and Telegram.
-- Consumption layer built: Databricks Genie Agent for ad-hoc queries against gold, plus a three-page Power BI report (Sales, Procurement, Workforce).
+- Consumption layer built: Databricks Genie Agent for ad-hoc queries against gold, plus a three-page Power BI report (Sales, Supplies, Workforce).
 - GitHub Actions CI built and passing: dbt tests run on every push, blocks merge on failure.
 - Not yet built: dev/staging/prod parameterization.
 
