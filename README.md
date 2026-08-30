@@ -16,7 +16,7 @@ For the full engineering reasoning behind each layer:
 - [`dataset/README.md`](dataset/README.md), the Postgres source on Ghost.build
 - [`dbt/README.md`](dbt/README.md), transformation layer, the fan-out bug, SCD2 design
 - [`airflow/README.md`](airflow/README.md), orchestration, Docker issues found and fixed, credential handling, alert routing
-- [`S3/README.md`](S3/README.md), Auto Loader ingestion, why this path exists
+- [`S3/README.md`](S3/README.md), Lakeflow ingestion pipeline, why this path exists
 
 This file stays high level. The subsystem READMEs carry the depth.
 
