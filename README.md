@@ -7,15 +7,15 @@
 ![PostgreSQL](https://img.shields.io/badge/postgresql-16%2B-336791.svg)
 ![CI](https://github.com/MoTahaAboHeiba/retail-lakehouse-pipeline/actions/workflows/dbt-ci.yml/badge.svg)
 
-End-to-end data engineering pipeline for retail data. Postgres OLTP source, Databricks lakehouse (bronze/silver/gold), dbt for transformation and testing, Airflow for orchestration, AWS S3 as a secondary ingestion path via Auto Loader, CI-gated on dbt tests through GitHub Actions.
+End-to-end data engineering pipeline for retail data. Postgres OLTP source, Databricks lakehouse (bronze, silver, gold), dbt for transformation and testing, Airflow for orchestration, AWS S3 as a secondary ingestion path via Auto Loader, and a consumption layer that serves both ad-hoc queries and a scheduled report. CI-gated on dbt tests through GitHub Actions.
 
-**Status: core pipeline built end to end, gold layer under active data validation.** Bronze through silver is complete and verified. Both gold fact tables are built and orchestrated, but the most recent full test run surfaced integrity defects in both. Root cause investigation is in progress, tracked in [`dbt/README.md`](dbt/README.md) and `DECISION_LOG.md`.
+**Status: complete, end to end.** Bronze through gold is built, tested, and orchestrated. The consumption layer is live: a Genie Agent answers ad-hoc questions directly against the gold layer, and a three-page Power BI report covers the recurring Sales, Procurement, and Workforce views. Airflow pushes failure alerts to Gmail and Telegram, so a broken run doesn't sit unnoticed.
 
 For the full engineering reasoning behind each layer:
 
 - [`dataset/README.md`](dataset/README.md), the Postgres source on Ghost.build
-- [`dbt/README.md`](dbt/README.md), transformation layer, the fan-out bug, SCD2 design, gold layer defect log
-- [`airflow/README.md`](airflow/README.md), orchestration, Docker issues found and fixed, credential handling
+- [`dbt/README.md`](dbt/README.md), transformation layer, the fan-out bug, SCD2 design
+- [`airflow/README.md`](airflow/README.md), orchestration, Docker issues found and fixed, credential handling, alert routing
 - [`S3/README.md`](S3/README.md), Auto Loader ingestion, why this path exists
 
 This file stays high level. The subsystem READMEs carry the depth.
@@ -36,32 +36,38 @@ This file stays high level. The subsystem READMEs carry the depth.
 - [Known limitations](#known-limitations)
 - [What I would change with more time](#what-i-would-change-with-more-time)
 
-
 ---
 
 ## Why this project exists
 
 I built this to close two gaps in my own skill set: dbt (incremental models, snapshots, metadata-driven transformation) and Docker (containerized orchestration). Databricks/Spark and Airflow fundamentals I already had, so time here is weighted toward what's actually new to me.
 
-This is not a from-scratch architecture idea. It's based on a published retail data engineering tutorial (Postgres to Databricks to dbt to Airflow), and I'm not pretending otherwise. What I control is the engineering decisions on top of that structure, documented here honestly, including every tradeoff, accepted limitation, and bug I found and fixed.
+This isn't a from-scratch architecture idea. It's based on a published retail data engineering tutorial (Postgres to Databricks to dbt to Airflow), and I'm not pretending otherwise. What I control is the engineering decisions on top of that structure, documented here honestly, including every tradeoff, accepted limitation, and bug I found and fixed.
 
 ---
 
 ## Architecture
 
-![ Project Architecture](docs/Project-Architecture.png)
+![Project architecture](docs/Project-Architecture.png)
 
-The gold layer is a galaxy schema, not a single star schema. Two business processes, Sales and Procurement, share conformed dimensions (`dim_product`, `dim_date`) while each keeps its own fact table at its own grain. Full reasoning in [`dbt/README.md`](dbt/README.md).
+Source systems (Postgres, S3) land in bronze, get cleaned into a silver layer built around one wide business table, and roll up into a gold layer shaped as a galaxy schema, not a single star schema. Two business processes, Sales and Procurement, share conformed dimensions (`dim_product`, `dim_date`) while each keeps its own fact table at its own grain. Full reasoning in [`dbt/README.md`](dbt/README.md).
+
+On top of gold sits the consumption layer. A Databricks Genie Agent answers ad-hoc, natural-language questions straight against the gold tables, for the questions a fixed report can't anticipate. A three-page Power BI report (Sales, Procurement, Workforce) covers the recurring, known-shape reporting need. The two aren't redundant: one handles questions nobody wrote a query for yet, the other handles the questions everyone asks every week.
+
+Airflow, running in Docker, orchestrates the whole chain and routes failure alerts to both Gmail and Telegram, so a broken run is visible somewhere a person actually checks, not just in the Airflow UI.
 
 ## Tech stack and why each piece is there
 
 | Tool | Role | Why |
 |---|---|---|
-| Databricks (Lakeflow Connect) | Bronze ingestion, primary source |  incremental load, cursor column plus primary key. Not CDC, see below. |
-| Databricks (LakeFlow External Locations) | Bronze ingestion, secondary source | S3 supplier delivery feed. |
+| Databricks (Lakeflow Connect) | Bronze ingestion, primary source | Incremental load, cursor column plus primary key. Not CDC, see below. |
+| Databricks (LakeFlow external locations) | Bronze ingestion, secondary source | S3 supplier delivery feed. |
 | dbt Core + dbt-databricks | Silver/gold transformation | Incremental models, SCD2 snapshots, metadata-driven OBT, galaxy schema gold layer. |
 | Airflow (Docker) | Orchestration | Triggers dbt runs and Databricks jobs. No transformation logic inside a DAG task. |
 | AWS S3 | Secondary ingestion path | Second source system feeding the same lakehouse, built and scheduled. |
+| Databricks Genie Agent | Ad-hoc consumption | Natural-language queries against the gold layer for business users, without waiting on a new report page. |
+| Power BI | Scheduled consumption | Three-page report (Sales, Procurement, Workforce) for the recurring reporting need. |
+| Gmail and Telegram (via Airflow) | Failure alerting | A DAG failure notifies two channels, not one, so it doesn't depend on a single person watching a single inbox. |
 | GitHub Actions | CI | Runs the full dbt test suite on every push, blocks merge on failure. Built and passing. |
 
 ## How to run this
@@ -85,7 +91,7 @@ python load_data.py           # loads all 6 CSVs, idempotent
 
 ### 2. Connect Databricks to both sources
 
-Primary path:   Lakeflow Connect against Postgres from step 1. Secondary path: Auto Loader against the S3 supplier feed. Full steps: [`S3/README.md`](S3/README.md)
+Primary path: Lakeflow Connect against Postgres from step 1. Secondary path: Auto Loader against the S3 supplier feed. Full steps: [`S3/README.md`](S3/README.md)
 
 ### 3. Build the transformation layer
 
@@ -105,7 +111,7 @@ Full steps: [`airflow/README.md`](airflow/README.md)
 
 ```
 cd airflow
-cp .env.example .env          # fill in Databricks credentials
+cp .env.example .env          # fill in Databricks credentials and Gmail/Telegram alert credentials
 docker compose up -d
 ```
 
@@ -113,9 +119,15 @@ Open the Airflow UI at `localhost:8080` and trigger `orchestrate.py`.
 
 ### Can you run this yourself
 
-Only with your own Databricks workspace and Postgres instance, this project doesn't ship a public demo environment. The proof section below stands in for a live demo.
+Only with your own Databricks workspace and Postgres instance. This project doesn't ship a public demo environment. The proof section below stands in for a live demo.
 
 ## Pipeline proof
+
+### Source data model
+
+![Source data model](docs/Data-model.jpg)
+
+Entity-relationship diagram for the six-table Postgres source schema that everything downstream is built on.
 
 ### dbt lineage
 
@@ -136,6 +148,31 @@ Generic tests across all four FK pairs, plus singular grain tests, including the
 
 Enforced sequential dependency between stages, and parallel task execution within a stage where no dependency exists.
 
+### Failure alerting
+
+![Failure alert to Gmail](docs/failure-to-gmail.jpg)
+![Failure alert to Telegram](docs/failure-to-telegram.jpg)
+
+A forced task failure in Airflow, alerted to both Gmail and Telegram from the same DAG run.
+
+### Ad-hoc queries via Genie Agent
+
+![Genie Agent query](docs/genie-agent.jpg)
+
+A natural-language question answered directly against the gold layer, no new report page required.
+
+### Power BI report
+
+![Workforce page](docs/Workforce.jpg)
+
+One of the three pages (Sales, Procurement, Workforce) built on the gold layer.
+
+### Secondary ingestion (S3)
+
+![Supplier deliveries S3 bucket](docs/supplier-deliveries-(S3-buck).jpg)
+
+The S3 supplier delivery feed that Auto Loader picks up as the pipeline's second source system.
+
 ### Source database running
 
 ![Ghost server running](docs/ghost-server-running.jpg)
@@ -150,7 +187,7 @@ GitHub Actions runs the full dbt test suite on every push and blocks merge on fa
 
 ## Important: ingestion pattern is not CDC
 
-**Decision:** Bronze ingestion uses Lakeflow Connect's  connector, cursor column plus primary key per table, not true CDC.
+**Decision:** Bronze ingestion uses Lakeflow Connect's connector, cursor column plus primary key per table, not true CDC.
 
 **Reasoning:** Databricks Free Edition is serverless-only, and true CDC needs a continuous classic-compute gateway to read the write-ahead log, which Free Edition can't provision. The tradeoff: this is scheduled polling, not continuous capture, each run captures only the latest row state. Accounted for explicitly in the snapshot design, not discovered late.
 
@@ -168,9 +205,9 @@ GitHub Actions runs the full dbt test suite on every push and blocks merge on fa
 
 **What happened:** `obt_business` produced 300,513 rows against an expected grain of 30,021. Every `dbt run` and `dbt test` passed clean, none of it caught this.
 
-**Root cause:** `employees` was joined into the OBT on `store_id`, not unique on that table, a store has many employees, so the join cross-producted. Deeper cause: `orders` has no `employee_id`, the source system never recorded which employee handled which order.
+**Root cause:** `employees` was joined into the OBT on `store_id`, not unique on that table. A store has many employees, so the join cross-producted. Deeper cause: `orders` has no `employee_id`, the source system never recorded which employee handled which order.
 
-**Fix:** removed the join instead of approximating one the data doesn't support. Employee stays its own dimension, connected to store in gold, not to the fact table. This is what led to the standing practice below, and it's also what caught the active gold layer defect noted in Current Build State. Full detail in [`dbt/README.md`](dbt/README.md) and `DECISION_LOG.md`.
+**Fix:** removed the join instead of approximating one the data doesn't support. Employee stays its own dimension, connected to store in gold, not to the fact table.
 
 **Standing practice:** every new or changed join gets a row count check against its expected grain before being called done. A green `dbt run` confirms execution, not correctness.
 
@@ -178,7 +215,7 @@ GitHub Actions runs the full dbt test suite on every push and blocks merge on fa
 
 **Decision:** Sales resolves `dim_product` point-in-time via SCD2. Procurement resolves to the current record only.
 
-**Reasoning:** A supplier delivery is a procurement transaction, not a product history event. Treating procurement cost changes as SCD2-worthy product history would conflate two different questions, what a product is, versus what it cost to acquire, into one timeline.
+**Reasoning:** A supplier delivery is a procurement transaction, not a product history event. Treating procurement cost changes as SCD2-worthy product history would conflate two different questions, what a product is versus what it cost to acquire, into one timeline.
 
 ### `dim_supplier`, SCD1, no surrogate key
 
@@ -191,6 +228,12 @@ GitHub Actions runs the full dbt test suite on every push and blocks merge on fa
 **Decision:** `dim_date` is shared across both facts, its range derived at build time from the min/max dates in the source tables, padded 30 days on each side.
 
 **Reasoning:** A hardcoded range silently stops covering new data with no error, just missing joins. Deriving it from live source data means the dimension grows with the data instead of needing manual extension.
+
+### Two consumption paths instead of one
+
+**Decision:** The gold layer serves both a Genie Agent for ad-hoc, natural-language questions and a fixed three-page Power BI report, rather than picking one.
+
+**Reasoning:** A fixed report answers the questions stakeholders ask every week and is cheap to consume. It can't answer the question nobody thought to build a page for. A natural-language agent against the same gold tables covers that gap without a new report cycle for every one-off question.
 
 ---
 
@@ -243,7 +286,7 @@ retail-lakehouse-pipeline/
 ## Current build state
 
 - Postgres source provisioned, 6 tables loaded (customers, stores, products, employees, orders, order_items).
-- Primary bronze ingestion built:  connector, cursor column plus primary key per table.
+- Primary bronze ingestion built: connector, cursor column plus primary key per table.
 - Secondary bronze ingestion built: S3 supplier feed via external location, scheduled upsert into a bronze streaming table.
 - Silver technical layer complete: all source tables incremental, including `supplier_deliveries_tech`.
 - Silver business layer complete: `obt_business` verified correct on grain after the fan-out fix.
@@ -253,21 +296,21 @@ retail-lakehouse-pipeline/
 - SCD2 snapshots complete for Sales-side dimensions, verified correct on a second run. `dim_supplier` deliberately SCD1, no snapshot, no stated business requirement to track history on reference data.
 - Generic and singular tests in place across silver and gold, including direct row count grain checks per fact table.
 - Airflow orchestration built and functioning in Docker, full DAG sequencing, credentials via Airflow Connection.
+- Airflow failure alerting built: task failures push to both Gmail and Telegram.
+- Consumption layer built: Databricks Genie Agent for ad-hoc queries against gold, plus a three-page Power BI report (Sales, Procurement, Workforce).
 - GitHub Actions CI built and passing: dbt tests run on every push, blocks merge on failure.
-- Not yet built: dev/staging/prod parameterization, Power BI reporting layer (in progress, three-page report planned: Sales, Procurement, Workforce).
+- Not yet built: dev/staging/prod parameterization.
 
 ---
 
 ## Known limitations
 
 - **Soft/hard deletes aren't tracked in bronze.** An `is_active` flag could support it, wiring it up needs Databricks Asset Bundles or a direct REST call, not exposed in the ingestion UI. Deferred.
-- ** connector captures latest state only per run**, not full change history. Addressed in the snapshot design, not ignored.
+- **The connector captures latest state only per run**, not full change history. Addressed in the snapshot design, not ignored.
 - **No employee-to-order relationship exists in the source data.** Employee reporting is answerable at the store level, not per order.
 - **No true business order date exists.** `created_at` is used as a stated proxy for order date in `fact_orders`. If it lags the real event, downstream time-based reporting inherits that lag.
 - **Supplier margin is an approximate, downstream-derived metric.** No lot or batch traceability links a specific delivery to the units later sold, so margin is a proximity-based approximation, stated as such.
 - **No environment split yet** (dev/staging/prod). One target, one connection.
-- **No failure alerting yet.** CI checks run and block merge, but a failure is visible only in the Actions tab, not pushed anywhere.
-
 
 ## What I would change with more time
 
