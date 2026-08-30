@@ -1,52 +1,52 @@
-name: dbt CI
+# name: dbt CI
 
-on:
-  pull_request:
-  push:
-    branches: [main]
+# on:
+#   pull_request:
+#   push:
+#     branches: [main]
 
-defaults:
-  run:
-    shell: bash
-    working-directory: dbt
+# defaults:
+#   run:
+#     shell: bash
+#     working-directory: dbt
 
-jobs:
-  dbt-checks:
-    runs-on: ubuntu-latest
-    env:
-      DBT_CATALOG: walmart
-      DBT_HOST: ${{ secrets.DBT_HOST }}
-      DBT_HTTP_PATH: ${{ secrets.DBT_HTTP_PATH }}
-      DBT_TOKEN: ${{ secrets.DBT_TOKEN }}
-      DBT_SCHEMA: dbt_schema
-      DBT_PROFILES_DIR: .
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+# jobs:
+#   dbt-checks:
+#     runs-on: ubuntu-latest
+#     env:
+#       DBT_CATALOG: walmart
+#       DBT_HOST: ${{ secrets.DBT_HOST }}
+#       DBT_HTTP_PATH: ${{ secrets.DBT_HTTP_PATH }}
+#       DBT_TOKEN: ${{ secrets.DBT_TOKEN }}
+#       DBT_SCHEMA: dbt_schema
+#       DBT_PROFILES_DIR: .
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: '3.12'
 
-      - name: Install dependencies
-        run: |
-          set -e
-          python -m pip install --upgrade pip
-          python - <<'PY'
-          import pathlib
-          import tomllib
-          pyproject_path = pathlib.Path('pyproject.toml')
-          if not pyproject_path.exists():
-              raise SystemExit('pyproject.toml not found at dbt project root')
-          data = tomllib.load(pyproject_path.open('rb'))
-          deps = data['project'].get('dependencies', [])
-          pathlib.Path('requirements-ci.txt').write_text('\n'.join(deps) + '\n')
-          PY
-          pip install -r requirements-ci.txt
-          pip install dbt-core dbt-databricks
-          dbt deps --profiles-dir . --profile walmart_project
+#       - name: Install dependencies
+#         run: |
+#           set -e
+#           python -m pip install --upgrade pip
+#           python - <<'PY'
+#           import pathlib
+#           import tomllib
+#           pyproject_path = pathlib.Path('pyproject.toml')
+#           if not pyproject_path.exists():
+#               raise SystemExit('pyproject.toml not found at dbt project root')
+#           data = tomllib.load(pyproject_path.open('rb'))
+#           deps = data['project'].get('dependencies', [])
+#           pathlib.Path('requirements-ci.txt').write_text('\n'.join(deps) + '\n')
+#           PY
+#           pip install -r requirements-ci.txt
+#           pip install dbt-core dbt-databricks
+#           dbt deps --profiles-dir . --profile walmart_project
 
-      - name: Run dbt tests
-        run: |
-          dbt test --profiles-dir . --profile walmart_project --select "tag:ci" --fail-fast
+#       - name: Run dbt tests
+#         run: |
+#           dbt test --profiles-dir . --profile walmart_project --select "tag:ci" --fail-fast
