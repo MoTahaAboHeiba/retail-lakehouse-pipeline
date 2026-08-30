@@ -121,12 +121,6 @@ Only with your own Databricks workspace and Postgres instance. This project does
 
 ## Pipeline proof
 
-### Source data model
-
-![Source data model](docs/Data-model.jpg)
-
-Entity-relationship diagram for the six-table Postgres source schema that everything downstream is built on.
-
 ### dbt lineage
 
 ![dbt data lineage](docs/dbt-data-lineage.jpg)
@@ -138,6 +132,15 @@ Full source-to-gold dependency graph from `dbt docs generate`.
 ![dbt test verification](docs/dbt-test-verification.jpg)
 
 Generic tests across all four FK pairs, plus singular grain tests, including the row count check that caught the employee fan-out bug below.
+
+---
+
+
+### data model
+
+![Source data model](docs/Data-model.jpg)
+
+---
 
 ### Airflow orchestration
 
@@ -152,6 +155,8 @@ Enforced sequential dependency between stages, and parallel task execution withi
 ![Failure alert to Telegram](docs/failure-to-telegram.jpg)
 
 A forced task failure in Airflow, alerted to both Gmail and Telegram from the same DAG run.
+
+---
 
 ### Ad-hoc queries via Genie Agent
 
@@ -169,7 +174,7 @@ One of the three pages (Sales, Supplies, Workforce) built on the gold layer.
 
 ![Supplier deliveries S3 bucket](docs/supplier-deliveries-(S3-buck).jpg)
 
-The S3 supplier delivery feed that Auto Loader picks up as the pipeline's second source system.
+The S3 supplier delivery feed as the pipeline's second source system.
 
 ### Source database running
 
@@ -215,7 +220,7 @@ GitHub Actions runs the full dbt test suite on every push and blocks merge on fa
 
 **Reasoning:** A supplier delivery is a Supplies transaction, not a product history event. Treating Supplies cost changes as SCD2-worthy product history would conflate two different questions, what a product is versus what it cost to acquire, into one timeline.
 
-### `dim_supplier`, SCD1, no surrogate key
+### `dim_supplier`, SCD1
 
 **Decision:** Supplier attributes are treated as low-volatility reference data. `fact_supplier_deliveries` joins on the natural key `supplier_id` directly, no surrogate key layer.
 
