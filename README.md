@@ -50,7 +50,7 @@ I built this to close a real gap in my own skill set: dbt, specifically incremen
 
 Source systems (Postgres, S3) land in bronze, get cleaned into a silver layer built around one wide business table, and roll up into a gold layer shaped as a galaxy schema, not a single star schema. Two business processes, Sales and Supplies, share conformed dimensions (`dim_product`, `dim_date`) while each keeps its own fact table at its own grain. Full reasoning in [`dbt/README.md`](dbt/README.md).
 
-On top of gold sits the consumption layer. A Databricks Genie Agent answers ad-hoc, natural-language questions straight against the gold tables, for the questions a fixed report can't anticipate. A three-page Power BI report (Sales, Supplies, Workforce) covers the recurring, known-shape reporting need. The two aren't redundant: one handles questions nobody wrote a query for yet, the other handles the questions everyone asks every week.
+On top of gold sits the consumption layer. A Databricks Genie Agent answers ad-hoc, natural-language questions straight against the gold tables, for the questions In plain English. A three-page Power BI report (Sales, Supplies, Workforce) covers the recurring, known-shape reporting need. The two aren't redundant: one handles questions nobody wrote a query for yet, the other handles the questions everyone asks every week.
 
 Airflow, running in Docker, orchestrates the whole chain and routes failure alerts to both Gmail and Telegram, so a broken run is visible somewhere a person actually checks, not just in the Airflow UI.
 
