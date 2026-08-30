@@ -9,7 +9,7 @@
 
 End-to-end data engineering pipeline for retail data. Postgres OLTP source, Databricks lakehouse (bronze, silver, gold), dbt for transformation and testing, Airflow for orchestration, AWS S3 as a secondary ingestion path via Lakeflow, and a consumption layer that serves both ad-hoc queries and a scheduled report. CI-gated on dbt tests through GitHub Actions.
 
-**Status: complete, end to end.** Bronze through gold is built, tested, and orchestrated. The consumption layer is live: a Genie Agent answers ad-hoc questions directly against the gold layer, and a three-page Power BI report covers the recurring Sales, Procurement, and Workforce views. Airflow pushes failure alerts to Gmail and Telegram, so a broken run doesn't sit unnoticed.
+**Status: complete, end to end.** Bronze through gold is built, tested, and orchestrated. The consumption layer is live: a Genie Agent answers ad-hoc questions directly against the gold layer, and a three-page Power BI report covers the recurring Sales, supplies, and Workforce views. Airflow pushes failure alerts to Gmail and Telegram, so a broken run doesn't sit unnoticed.
 
 For the full engineering reasoning behind each layer:
 
