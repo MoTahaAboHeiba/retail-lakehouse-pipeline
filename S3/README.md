@@ -61,6 +61,6 @@ The tradeoff is explicit: the managed pipeline offers less visibility into per-f
 
 ## Proof
 
-![S3 pipeline running](../docs/supplier-deliveries-(S3-buck).jpg)
+![S3 pipeline running](../docs/supplier-deliveries-(S3-bucket).jpg)
 
 Lakeflow pipeline connected to the S3 external location, loading supplier delivery CSVs into `supplier_deliveries_b`.
