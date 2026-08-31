@@ -311,8 +311,6 @@ retail-lakehouse-pipeline/
 - **Soft/hard deletes aren't tracked in bronze.** An `is_active` flag could support it, wiring it up needs Databricks Asset Bundles or a direct REST call, not exposed in the ingestion UI. Deferred.
 - **The connector captures latest state only per run**, not full change history. Addressed in the snapshot design, not ignored.
 - **No employee-to-order relationship exists in the source data.** Employee reporting is answerable at the store level, not per order.
-- **No true business order date exists.** `created_at` is used as a stated proxy for order date in `fact_orders`. If it lags the real event, downstream time-based reporting inherits that lag.
-- **Supplier margin is an approximate, downstream-derived metric.** No lot or batch traceability links a specific delivery to the units later sold, so margin is a proximity-based approximation, stated as such.
 - **No environment split yet** (dev/staging/prod). One target, one connection.
 
 ## What I would change with more time
