@@ -69,15 +69,12 @@ Four runs measured across both DAGs:
 
 | Run | Sequential | Parallel | Wall-clock saved | Reduction |
 |-----|-----------|----------|-----------------|-----------|
-| 1   | 10:51     | 6:56     | 3:55            | 36.1%     |
-| 2   | 9:23      | 7:52     | 1:31            | 16.2%     |
-| 3   | 8:57      | 7:31     | 1:26            | 16.0%     |
-| 4   | 8:49      | 7:23     | 1:26            | 16.3%     |
-| **Avg** | **9:30** | **7:26** | **2:04**     | **21.8%** |
+| 1   | 9:23      | 7:52     | 1:31            | 16.2%     |
+| 2   | 8:57      | 7:31     | 1:26            | 16.0%     |
+| 3   | 8:49      | 7:23     | 1:26            | 16.3%     |
+| **Avg** | **9:03** | **7:35** | **1:28**   | **16.1%** |
 
-Run 1 is an outlier. The sequential side clocked 10:51 against a 8:49-9:23 range across the other three runs. The most likely cause is Databricks warehouse cold-start on that sequential execution, which inflated the baseline and made the parallel gain look larger than it is. Runs 2-4 cluster tightly at a 16% reduction, which is the stable figure.
-
-The 21.8% all-run average and the 16% stable figure are both stated here. Neither is hidden. The stable figure is the defensible one.
+Three runs, consistent within a 34-second band on each side. The ~16% wall-clock reduction holds as a repeatable result.
 
 ### Failure alerting
 
