@@ -1,5 +1,8 @@
 # S3 secondary ingestion
 
+![AWS S3](https://img.shields.io/badge/AWS-S3-FF9900.svg)
+![Databricks](https://img.shields.io/badge/databricks-lakeflow-FF3621.svg)
+
 This directory covers the secondary ingestion path for the retail lakehouse pipeline: monthly supplier delivery CSVs from AWS S3 into the bronze layer.
 
 ---
