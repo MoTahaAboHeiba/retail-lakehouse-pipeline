@@ -1,5 +1,9 @@
 # Gold Layer Reference
 
+![dbt](https://img.shields.io/badge/dbt-core-orange.svg)
+![Power BI](https://img.shields.io/badge/Power_BI-consumption-F2C811.svg)
+![Genie](https://img.shields.io/badge/Databricks-Genie_Agent-FF3621.svg)
+
 ## Architecture
 
 Galaxy schema (fact constellation). Two independent business processes, shared conformed dimensions only where the relationship is real.
