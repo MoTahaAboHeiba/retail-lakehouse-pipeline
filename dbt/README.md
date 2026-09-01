@@ -1,5 +1,9 @@
 # dbt Transformation Layer
 
+![dbt](https://img.shields.io/badge/dbt-core_1.11-orange.svg)
+![Databricks](https://img.shields.io/badge/databricks-lakehouse-FF3621.svg)
+![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)
+
 This directory contains the full transformation pipeline for the retail lakehouse project: bronze sources in, gold galaxy schema out. Every layer below is a deliberate architectural decision, not a default. Where a decision traded something off, that tradeoff is stated here, not left for someone else to find.
 
 ---
