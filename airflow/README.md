@@ -1,7 +1,12 @@
+
 # Airflow orchestration
 
-This directory contains the orchestration layer for the retail lakehouse pipeline.
+![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)
+![Airflow](https://img.shields.io/badge/airflow-orchestration-017CEE.svg)
+![Docker](https://img.shields.io/badge/docker-containerized-2496ED.svg)
+![Databricks](https://img.shields.io/badge/databricks-compute-FF3621.svg)
 
+This directory contains the orchestration layer for the retail lakehouse pipeline.
 Airflow doesn't ingest data and doesn't transform data. It sequences two systems that already do those jobs: a Databricks job for ingestion, and dbt for every transformation. The DAG's only job is ordering, dependency enforcement, and failure isolation.
 
 ---
