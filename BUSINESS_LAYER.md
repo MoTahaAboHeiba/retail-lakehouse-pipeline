@@ -1,5 +1,8 @@
 # Business layer
 
+![Power BI](https://img.shields.io/badge/Power_BI-report-F2C811.svg)
+![Genie](https://img.shields.io/badge/Databricks-Genie_Agent-FF3621.svg)
+
 This file is for anyone who wants to understand what the pipeline actually delivers, without reading about dbt models or Airflow DAGs. If you are a data engineer and want the technical depth, start with [`dbt/README.md`](dbt/README.md).
 
 The pipeline produces two consumption surfaces: a three-page Power BI report for structured analysis, and a Databricks Genie Agent for questions the fixed report pages don't cover.
