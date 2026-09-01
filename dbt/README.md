@@ -4,10 +4,11 @@ This directory contains the full transformation pipeline for the retail lakehous
 
 ---
 
-## Pipeline Flow
+## Pipeline flow
 
 ```text
-Bronze (Databricks, via Lakeflow Connect + S3 external location)
+Bronze (Databricks: Lakeflow Connect query-based connector for PostgreSQL,
+         Lakeflow file connector via Unity Catalog external location for S3)
         │
         ▼
 sources.yml
@@ -35,7 +36,7 @@ Two independent business processes, shared conformed dimensions only where the r
 
 ---
 
-## Project Structure
+## Project structure
 
 ```text
 dbt/
@@ -93,7 +94,7 @@ dbt/
 
 ---
 
-# Engineering Decisions
+## Engineering decisions
 
 ## Sources are declared, never hardcoded
 
@@ -155,15 +156,29 @@ dbt/
 
 **Engineering reasoning:** Manual SCD2 merge logic is typically hundreds of lines of hand-written merge SQL. dbt reduces this to a YAML config per dimension. One file per dimension instead of one combined file, a broken snapshot is isolated to a single file, not buried in a shared one. Verified correct by running each snapshot twice with a changed source value between runs: exactly one active row per key, `dbt_valid_to` populates correctly on the superseded row, no duplication.
 
+**`dbt snapshot --full-refresh` is not supported on dbt Core 1.11.** The rebuild path is a manual `DROP TABLE` in Databricks SQL followed by `dbt snapshot`. This is the platform-correct approach, not a workaround.
+
 **Default column names (`dbt_valid_from`, `dbt_valid_to`) kept deliberately.** The `dbt_` prefix signals dbt manages and can overwrite these columns. Renaming them without a documented reason weakens the design in an interview, it looks like a customization with no justification behind it.
 
 **Independent SCD2 timelines, not a shared one.** Store and employee dimensions each carry their own `dbt_valid_from`/`dbt_valid_to`, joined to each other by business key (`store_id`) and each filtered for validity independently. Forcing a shared validity window across two dimensions that change on different schedules would produce point-in-time joins that are structurally present but temporally wrong, an employee promotion shouldn't force a store record to appear to change too.
+
+## SCD2 floor-gap fallback join in `fact_orders`
+
+**Problem:** A strict `BETWEEN dbt_valid_from AND dbt_valid_to` predicate silently null-fills surrogate keys for any order that predates the earliest tracked version of a dimension key. Snapshot observation time is not the same as entity creation time. Orders that predate the first snapshot run have no valid SCD2 window to land in, so the join returns null and the row survives with a null foreign key, invisible to a passing dbt test.
+
+**Fix:** Precomputed per-key floor CTEs (`MIN(dbt_valid_from) GROUP BY <natural_key>`) with a fallback join branch that assigns the earliest known version to any order that falls before it. Correlated scalar subqueries were rejected: Spark Catalyst does not support them in this context. The floor CTE pattern is the correct approach on Databricks.
+
+**Verified:** Zero nulls across all surrogate and natural key columns in `fact_orders` after fix. 30,021 rows, grain confirmed.
+
+---
 
 ## Gold layer: galaxy schema
 
 Two independent business processes, Sales and Procurement, each with its own fact table at its own grain, sharing conformed dimensions only where the relationship is structurally real (`dim_date`, `dim_products_current`). `obt_business` feeds `fact_orders` only, `fact_supplier_deliveries` sources directly from `supplier_deliveries_tech`, there's no shared grain between the two processes to force through one big table.
 
-Full model inventory, the point-in-time join fallback for `fact_orders`, the `dim_products_current` outrigger design and the alternatives rejected for it, and the current SCD strategy per dimension:  [`dbt/models/gold/README.md`](models/gold/README.md).
+**`dim_products_current` outrigger:** An SCD2 dimension is not unique on its natural key by design. Power BI cannot build a valid relationship against a non-unique column, so a direct relationship from either fact table to the full SCD2 `dim_products` is not possible. `dim_products_current` is pre-filtered to one active row per product and carries both `dbt_scd_id` (for `fact_supplier_deliveries`, current-state resolution) and `product_id` (for `fact_orders`, point-in-time resolution via the floor-gap join above). One pre-filtered view, two join paths, no duplication of SCD2 history.
+
+Full model inventory and the current SCD strategy per dimension: [`dbt/models/gold/README.md`](models/gold/README.md).
 
 ![data model](../docs/Data-model.jpg)
 
@@ -175,7 +190,7 @@ Full source-to-gold dependency graph, `dbt docs generate`.
 
 ![dbt test verification](../docs/dbt-test-verification.jpg)
 
-Test run output, generic and grain tests across silver and gold.
+123/123 tests passing. Generic and grain tests across silver and gold.
 
 ---
 
