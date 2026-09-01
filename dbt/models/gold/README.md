@@ -4,9 +4,7 @@
 
 Galaxy schema (fact constellation). Two independent business processes, shared conformed dimensions only where the relationship is real.
 
-- `fact_orders` — sales, order line grain
-- `fact_supplier_deliveries` — procurement, delivery line grain
-- `obt_business` feeds `fact_orders` only. No shared grain between Sales and Procurement, so `fact_supplier_deliveries` sources directly from `supplier_deliveries_tech`.
+![Data model](../../../docs/Data-model.jpg)
 
 ## Model Inventory
 
