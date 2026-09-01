@@ -5,6 +5,8 @@
 ![Databricks](https://img.shields.io/badge/databricks-lakehouse-red.svg)
 ![Airflow](https://img.shields.io/badge/airflow-orchestration-017CEE.svg)
 ![PostgreSQL](https://img.shields.io/badge/postgresql-16%2B-336791.svg)
+![Power BI](https://img.shields.io/badge/Power_BI-report-F2C811.svg)
+![Genie](https://img.shields.io/badge/Databricks-Genie_Agent-FF3621.svg)
 ![CI](https://github.com/MoTahaAboHeiba/retail-lakehouse-pipeline/actions/workflows/dbt-ci.yml/badge.svg)
 
 End-to-end data engineering pipeline for retail data. Postgres OLTP source, Databricks lakehouse (bronze, silver, gold), dbt for transformation and testing, Airflow for orchestration, AWS S3 as a secondary ingestion path via Lakeflow, and a consumption layer that serves both ad-hoc queries and a scheduled report. CI-gated on dbt tests through GitHub Actions.
