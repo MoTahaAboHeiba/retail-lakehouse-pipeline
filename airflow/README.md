@@ -8,43 +8,16 @@ Airflow doesn't ingest data and doesn't transform data. It sequences two systems
 
 ## Pipeline flow
 
-```text
-Databricks Ingestion
-        │
-        ▼
-dbt deps
-        │
-        ▼
-Source Freshness
-        │
-        ▼
-Silver Technical
-        │
-        ▼
-Silver Technical Tests
-        │
-        ▼
-Silver Business
-        │
-        ▼
-Silver Business Tests
-        │
-        ▼
-Gold Ephemeral Models
-        │
-        ▼
-Snapshots (SCD Type 2)
-        │
-        ▼
-     dim_date
-        │
-   ┌────┴────┐
-   ▼         ▼
- Sales   Procurement
-   │         │
-   └────┬────┘
-        ▼
-   gold_tests()
+```mermaid
+flowchart LR
+    ing[Databricks ingestion] --> deps[dbt deps] --> fresh[Source freshness]
+    fresh --> st[Silver technical] --> stt[Silver technical tests]
+    stt --> sb[Silver business] --> sbt[Silver business tests]
+    sbt --> eph[Gold ephemeral] --> snap["Snapshots\nSCD Type 2"] --> dd[dim_date]
+    dd --> sales[Sales]
+    dd --> proc[Procurement]
+    sales --> gt[gold_tests]
+    proc --> gt
 ```
 
 Each arrow is a hard dependency. If a stage fails, nothing downstream of it runs. No dbt task executes against partially ingested or partially tested data.
