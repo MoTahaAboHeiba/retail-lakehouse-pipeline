@@ -18,21 +18,15 @@ The three components are distinct and each owns a different responsibility:
 
 ## Architecture
 
-```text
-S3 bucket (monthly supplier_deliveries CSVs)
-        │
-        │  READ FILES via Unity Catalog external location
-        ▼
-Lakeflow pipeline (Databricks-managed schedule, outside Airflow)
-        │
-        ▼
-supplier_deliveries_b (bronze, streaming Delta table)
-        │
-        ▼
-supplier_deliveries_tech (dbt silver, incremental, unique_key='delivery_id', strategy='merge')
-        │
-        ▼
-dim_supplier + fact_supplier_deliveries (gold, procurement business process)
+```mermaid
+flowchart LR
+    s3["S3 bucket\nmonthly supplier CSVs"]
+    lf["Lakeflow pipeline\nDatabricks-managed schedule"]
+    b["supplier_deliveries_b\nbronze streaming table"]
+    tech["supplier_deliveries_tech\ndbt silver incremental"]
+    gold["dim_supplier\nfact_supplier_deliveries"]
+
+    s3 -->|"READ FILES\nUnity Catalog external location"| lf --> b --> tech --> gold
 ```
 
 Two separate merge operations at two separate layers: the Lakeflow pipeline merges new S3 files into the bronze streaming table. `supplier_deliveries_tech` is a separate incremental dbt model that reads from that bronze table with its own `unique_key` and merge strategy. Two distinct decisions, not one operation described twice.
