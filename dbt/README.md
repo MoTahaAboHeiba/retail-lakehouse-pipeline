@@ -6,30 +6,21 @@ This directory contains the full transformation pipeline for the retail lakehous
 
 ## Pipeline flow
 
-```text
-Bronze (Databricks: Lakeflow Connect query-based connector for PostgreSQL,
-         Lakeflow file connector via Unity Catalog external location for S3)
-        │
-        ▼
-sources.yml
-        │
-        ▼
-Silver Technical (one model per source table, incremental)
-        │
-        ▼
-Silver Business (metadata-driven One Big Table)
-        │
-        ▼
-Tests (generic + singular, grain verification)
-        │
-        ▼
-Gold Ephemeral (dimension prep, inline CTEs only)
-        │
-        ▼
-Snapshots (SCD Type 2, one file per SCD2 dimension)
-        │
-        ├──> Gold Fact: fact_orders (sales, order line grain)
-        └──> Gold Fact: fact_supplier_deliveries (procurement, delivery line grain)
+```mermaid
+flowchart LR
+    bronze["Bronze\nPostgreSQL via Lakeflow Connect\nS3 via managed Lakeflow pipeline"]
+    src[sources.yml]
+    st[Silver technical]
+    sb[Silver business]
+    tests[Tests]
+    eph[Gold ephemeral]
+    snap["Snapshots\nSCD Type 2"]
+    fo["fact_orders\norder line grain"]
+    fsd["fact_supplier_deliveries\ndelivery line grain"]
+
+    bronze --> src --> st --> sb --> tests --> eph --> snap
+    snap --> fo
+    snap --> fsd
 ```
 
 Two independent business processes, shared conformed dimensions only where the relationship is real. Full reasoning: [`dbt/models/gold/README.md`](models/gold/README.md).
