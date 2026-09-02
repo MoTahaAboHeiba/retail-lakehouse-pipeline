@@ -67,7 +67,7 @@ Airflow, running in Docker, orchestrates the full chain and routes task failure 
 | PostgreSQL (Ghost.build) | OLTP source | Six-table retail schema: customers, stores, products, employees, orders, order\_items. |
 | Databricks Lakeflow Connect | Primary bronze ingestion | Query-based connector, cursor column plus primary key upsert per table. Not CDC. See [Ingestion pattern](#ingestion-pattern-not-cdc). |
 | AWS S3 + Lakeflow managed pipeline | Secondary bronze ingestion | Monthly supplier delivery CSVs. Managed Lakeflow pipeline handles file detection and bronze merge, no custom code. |
-| dbt Core 1.11 + dbt-databricks 1.12.2 | Silver and gold transformation | Incremental models, SCD2 snapshots, metadata-driven OBT, galaxy schema. |
+| dbt Core + dbt-databricks | Silver and gold transformation | Incremental models, SCD2 snapshots, metadata-driven OBT, galaxy schema. |
 | Apache Airflow (Docker) | Orchestration | Sequences Databricks jobs and dbt runs. No transformation logic inside a DAG task. |
 | Databricks Genie Agent | Ad-hoc consumption | Natural language interface over the gold layer for questions the fixed report doesn't cover. |
 | Power BI Desktop | Structured consumption | Three-page report (Sales, Supplies, Workforce). Import mode via Databricks Partner Connect. |
@@ -373,8 +373,6 @@ retail-lakehouse-pipeline/
 - **Soft and hard deletes are not tracked in bronze.** The query-based connector captures the latest row state per run. A deleted source row disappears silently. Wiring an `is_active` flag into the Lakeflow Connect ingestion requires Databricks Asset Bundles or a direct REST call. Deferred.
 - **Lakeflow Connect captures latest state only per run.** Changes between two consecutive runs are not captured as individual events. Accounted for in the SCD2 snapshot design.
 - **No employee-to-order relationship exists in the source data.** `orders` has no `employee_id` column. Employee reporting is answerable at the store level only.
-- **`created_at` is used as the order date proxy.** No true business order date field exists. If `created_at` lags the actual event, time-based reporting inherits that lag with no way to detect it.
-- **Supplier margin is approximate.** No lot or batch traceability links a specific delivery to the units later sold. Any cross-process margin figure is a proximity-based approximation.
 - **No environment split.** One Databricks target, one connection. Dev, staging, and prod are not parameterized.
 - **No automated PAT token rotation.** The Databricks Personal Access Token used by Airflow expires on a fixed schedule. Rotation requires manual intervention and has caused live DAG failures.
 - **Power BI data freshness is bounded by the import refresh schedule.** The report reflects the gold layer state at the last refresh, not the current moment.
@@ -385,5 +383,4 @@ retail-lakehouse-pipeline/
 
 - **Automate PAT token rotation.** Replace PAT-based auth with Databricks service principal OAuth M2M to eliminate manual rotation and the live failure risk it carries.
 - **Add a dev/staging/prod environment split.** One target with one connection means pipeline changes and production data share the same namespace. Databricks Asset Bundles with environment-scoped targets would address this.
-- **Adopt dbt state-based selective runs.** `--select state:modified+` would run only what changed upstream instead of the full DAG on every execution.
 - **Persist `manifest.json` and `run_results.json` between Airflow runs.** Right now dbt run history is only visible in the Airflow UI at point-in-time. Persisting these artifacts enables historical trend analysis across runs.
