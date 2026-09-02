@@ -180,7 +180,7 @@ Natural language query answered directly against the gold layer. 231 active empl
 
 ![Workforce page](docs/Workforce.jpg)
 
-One of three report pages built on the gold layer. Full report at [retail-report.com].
+One of three report pages built on the gold layer. Full report at [[retail-report]](https://app.powerbi.com/links/ooiic6Ccn2?ctid=5f593c84-cad4-46c8-b3de-321c3e829a99&pbi_source=linkShare).
 
 ### Secondary ingestion (S3)
 
