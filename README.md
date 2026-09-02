@@ -44,9 +44,7 @@ This file stays high level. The subsystem READMEs carry the depth.
 
 ## Why this project exists
 
-I built this to close two concrete gaps in my skill set: dbt (incremental models, SCD2 snapshots, metadata-driven transformation) and Docker (containerized orchestration). Databricks, Spark, and Airflow fundamentals I already had. Time on this project is weighted toward what was actually new to me.
-
-This is not a from-scratch architecture idea. It is based on a published retail data engineering tutorial (Postgres to Databricks to dbt to Airflow). I am not pretending otherwise. What I own is the engineering decisions layered on top: every design choice, tradeoff, defect found, and fix applied is documented here with the reasoning. The tutorial provided the shape. The decisions are mine.
+I built this to close a real gap in my own skill set: dbt, specifically incremental models, snapshots, and metadata-driven transformation, was new to me going in. Docker and Airflow were not new in theory, I already had a strong foundation in both, but I'd never built and run them end to end in an actual project before this one. Databricks/Spark fundamentals I already had from prior hands-on work, so time here is weighted toward dbt and toward turning Docker/Airflow knowledge I already held into something I've actually shipped.
 
 ---
 
