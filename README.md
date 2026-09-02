@@ -184,7 +184,7 @@ One of three report pages built on the gold layer. Full report at [retail-report
 
 ### Secondary ingestion (S3)
 
-![Supplier deliveries S3 pipeline](docs/supplier-deliveries-(S3-buck).jpg)
+![Supplier deliveries S3 pipeline](docs/supplier-deliveries-(S3-bucket).jpg)
 
 Managed Lakeflow pipeline loading supplier delivery CSVs from S3 into `supplier_deliveries_b`.
 
