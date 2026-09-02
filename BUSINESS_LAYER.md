@@ -7,7 +7,7 @@ This file is for anyone who wants to understand what the pipeline actually deliv
 
 The pipeline produces two consumption surfaces: a three-page Power BI report for structured analysis, and a Databricks Genie Agent for questions the fixed report pages don't cover.
 
-**Live report:** [retail-report.com]
+**Live report:**  [retail-report](https://app.powerbi.com/links/ooiic6Ccn2?ctid=5f593c84-cad4-46c8-b3de-321c3e829a99&pbi_source=linkShare).
 
 ---
 
@@ -31,7 +31,7 @@ The pipeline produces two consumption surfaces: a three-page Power BI report for
 
 ## How to access the report
 
-**Power BI report:** The live published report is at [retail-report.com]. No login required to view.
+**Power BI report:** The live published report is at [retail-report](https://app.powerbi.com/links/ooiic6Ccn2?ctid=5f593c84-cad4-46c8-b3de-321c3e829a99&pbi_source=linkShare). No login required to view.
 
 **Genie Agent:** The agent runs inside Databricks. Access requires a Databricks workspace login. A screenshot of a live query is in the [Genie Agent](#genie-agent) section below.
 
