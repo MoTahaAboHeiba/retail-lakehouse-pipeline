@@ -18,3 +18,20 @@ The batches simulate **new records and updates to existing records**, using the 
 Batch000 → Batch001 → Batch002 → Batch003 → Batch004
  Baseline       Incremental Changes
 ```
+## Dataset
+
+The current PostgreSQL source contains **1,653,490 rows** across 6 OLTP tables:
+
+| Table | Rows |
+|---|---:|
+| customers | 22,000 |
+| products | 600 |
+| employees | 450 |
+| orders | 407,500 |
+| order_items | 1,223,915 |
+| stores | 25 |
+| **Total** | **1,653,490** |
+
+This workload is large enough to validate the pipeline's incremental ingestion, PK-based upserts, cursor logic, relational integrity, and moderate performance behavior.
+
+It should be considered a **medium-scale synthetic workload**, not a production-scale benchmark.
