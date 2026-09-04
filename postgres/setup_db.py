@@ -10,9 +10,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-CONN_STRING = os.getenv("POSTGRES_CONNECTION_STRING")
+CONN_STRING = os.getenv("NEW_POSTGRES_CONNECTION_STRING")
 if not CONN_STRING:
-    print("ERROR: POSTGRES_CONNECTION_STRING not found in .env")
+    print("ERROR: NEW_POSTGRES_CONNECTION_STRING not found in .env")
     print("Please add it to Agentic DB/.env")
     exit(1)
 
@@ -30,8 +30,14 @@ try:
         ddl_sql = f.read()
     
     print("\n Executing DDL to create schema and tables...")
-    cur.execute(ddl_sql)
-    print("DDL executed successfully! Schema `raw` and all 6 tables created.")
+    try:
+        cur.execute(ddl_sql)
+        print("DDL executed successfully! Schema `raw` and all 6 tables created.")
+    except Exception as exc:
+        if "already exists" in str(exc).lower():
+            print("DDL already applied; existing raw tables will be reused.")
+        else:
+            raise
     
     # Verify tables
     cur.execute("""
@@ -56,3 +62,4 @@ try:
 except Exception as e:
     print(f" Error: {e}")
     exit(1)
+
