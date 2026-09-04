@@ -1,0 +1,111 @@
+product_id,product_name,category,brand,price,created_timestamp,updated_timestamp,is_active
+501,Your Make Product,Grocery,Apple,1223.45,2027-01-18 04:39:23,2027-01-24 04:39:23,Y
+502,Act Certain Product,Electronics,Sony,1206.43,2027-01-14 13:11:11,2027-01-17 13:11:11,Y
+503,Stuff Discuss Product,Clothing,LG,1095.63,2027-01-13 08:09:55,2027-01-31 23:59:59,Y
+504,Agree Artist Product,Clothing,Adidas,671.47,2027-01-28 13:48:21,2027-01-31 23:59:59,Y
+505,Special Home Product,Home,Adidas,1002.11,2027-01-28 00:01:24,2027-01-31 23:59:59,Y
+506,Direction Stuff Product,Electronics,Nestle,1055.58,2027-01-27 21:39:01,2027-01-31 23:59:59,Y
+507,Else Anything Product,Sports,Apple,1190.02,2027-01-14 08:07:42,2027-01-31 23:59:59,Y
+508,Simple Around Product,Electronics,Samsung,720.82,2027-01-19 19:12:30,2027-01-31 23:59:59,Y
+509,Action Total Product,Clothing,Nestle,1069.56,2027-01-12 01:28:19,2027-01-30 01:28:19,Y
+510,At Several Product,Electronics,Nike,1047.25,2027-01-23 03:45:44,2027-01-31 23:59:59,Y
+511,Challenge Industry Product,Sports,Nike,550.84,2027-01-15 06:54:26,2027-01-31 23:59:59,Y
+512,Social Pay Product,Clothing,LG,1312.11,2027-01-19 07:58:04,2027-01-30 07:58:04,Y
+513,Suddenly Animal Product,Grocery,Samsung,1469.58,2027-01-10 17:20:38,2027-01-31 23:59:59,Y
+514,Point Century Product,Home,Apple,1077.64,2027-01-10 10:24:02,2027-01-17 10:24:02,Y
+515,Training For Product,Clothing,Samsung,765.23,2027-01-18 02:38:08,2027-01-30 02:38:08,Y
+516,Woman Camera Product,Clothing,Sony,314.92,2027-01-29 21:52:52,2027-01-31 23:59:59,Y
+517,Act Continue Product,Sports,Sony,688.94,2027-01-04 22:01:11,2027-01-12 22:01:11,Y
+518,Store Again Product,Toys,Adidas,1245.39,2027-01-16 22:04:10,2027-01-31 23:59:59,Y
+519,Mind Science Product,Toys,Adidas,398.07,2027-01-08 10:37:18,2027-01-31 23:59:59,Y
+520,Interview Most Product,Electronics,Samsung,480.42,2027-01-14 20:16:10,2027-01-31 23:59:59,Y
+521,Weight Everything Product,Electronics,Samsung,376.37,2027-01-27 07:40:48,2027-01-31 23:59:59,Y
+522,Statement Wonder Product,Clothing,Nestle,342.45,2027-01-08 11:53:11,2027-01-28 11:53:11,Y
+523,Hot Top Product,Home,Adidas,619.35,2027-01-06 03:19:13,2027-01-29 03:19:13,Y
+524,Responsibility Miss Product,Electronics,Samsung,352.86,2027-01-05 20:38:24,2027-01-31 23:59:59,Y
+525,Price Impact Product,Sports,Samsung,1224.83,2027-01-24 06:56:25,2027-01-31 23:59:59,Y
+526,Research Leader Product,Clothing,Adidas,22.26,2027-01-19 14:53:42,2027-01-31 23:59:59,Y
+527,Fact Clearly Product,Grocery,Nike,565.88,2027-01-06 02:30:57,2027-01-14 02:30:57,Y
+528,Choice Big Product,Electronics,Sony,102.49,2027-01-27 04:27:40,2027-01-31 23:59:59,Y
+529,Keep Wrong Product,Grocery,LG,1381.62,2027-01-05 19:27:50,2027-01-31 23:59:59,Y
+530,With Mr Product,Home,Sony,1056.78,2027-01-19 17:01:05,2027-01-26 17:01:05,Y
+531,Season Four Product,Clothing,Adidas,235.93,2027-01-15 18:15:55,2027-01-29 18:15:55,Y
+532,Recently Store Product,Sports,Nestle,1206.21,2027-01-22 11:52:02,2027-01-31 23:59:59,Y
+533,Animal Street Product,Home,Samsung,1417.34,2027-01-03 07:32:53,2027-01-31 23:59:59,Y
+534,Drug Would Product,Toys,LG,46.81,2027-01-04 07:33:50,2027-01-31 23:59:59,Y
+535,Spring Camera Product,Toys,Nestle,767.89,2027-01-26 14:31:18,2027-01-31 23:59:59,Y
+536,Catch Appear Product,Sports,Samsung,951.11,2027-01-03 04:02:08,2027-01-07 04:02:08,Y
+537,Board Law Product,Grocery,Sony,604.52,2027-01-30 21:45:38,2027-01-31 23:59:59,Y
+538,Option Class Product,Electronics,Adidas,940.98,2027-01-12 13:54:13,2027-01-31 23:59:59,Y
+539,Similar Want Product,Home,LG,396.26,2027-01-08 01:31:17,2027-01-31 23:59:59,Y
+540,Always Spring Product,Grocery,Adidas,951.13,2027-01-27 00:08:36,2027-01-31 23:59:59,Y
+541,Time Majority Product,Electronics,Apple,477.76,2027-01-30 17:40:18,2027-01-31 23:59:59,Y
+542,Discover Ago Product,Sports,Adidas,868.07,2027-01-01 20:04:45,2027-01-31 23:59:59,Y
+543,Whom Player Product,Electronics,Adidas,929.22,2027-01-13 13:27:59,2027-01-31 23:59:59,Y
+544,Skin Tonight Product,Clothing,Adidas,221.37,2027-01-01 01:41:25,2027-01-08 01:41:25,Y
+545,Experience Number Product,Grocery,Adidas,1457.52,2027-01-22 13:46:39,2027-01-31 23:59:59,Y
+546,Know Gun Product,Sports,Adidas,628.43,2027-01-13 05:41:59,2027-01-31 23:59:59,Y
+547,Daughter Since Product,Electronics,Apple,608.35,2027-01-01 21:55:49,2027-01-31 23:59:59,Y
+548,Strong Occur Product,Electronics,Apple,580.45,2027-01-05 00:17:31,2027-01-31 23:59:59,Y
+549,Environment Book Product,Grocery,Nestle,396.54,2027-01-06 23:48:27,2027-01-20 23:48:27,Y
+550,Seek Quality Product,Toys,LG,1036.29,2027-01-26 21:40:11,2027-01-31 23:59:59,Y
+551,Current Hit Product,Grocery,Samsung,475.66,2027-01-18 23:21:52,2027-01-31 23:59:59,Y
+552,Law Include Product,Home,Apple,554.05,2027-01-09 23:25:34,2027-01-31 23:59:59,Y
+553,Risk Also Product,Home,Nike,203.58,2027-01-02 15:30:21,2027-01-31 23:59:59,Y
+554,Staff Happen Product,Toys,Sony,31.11,2027-01-16 14:58:24,2027-01-31 23:59:59,Y
+555,Property Plant Product,Toys,Adidas,7.75,2027-01-26 00:17:02,2027-01-31 23:59:59,Y
+556,Provide Quite Product,Sports,Adidas,1368.62,2027-01-20 16:55:38,2027-01-31 23:59:59,Y
+557,Interest Sense Product,Grocery,Samsung,288.47,2027-01-14 02:00:27,2027-01-31 23:59:59,Y
+558,Son Drug Product,Sports,Nike,221.38,2027-01-18 14:48:39,2027-01-30 14:48:39,Y
+559,Reduce Attack Product,Electronics,LG,405.04,2027-01-03 06:23:10,2027-01-31 23:59:59,Y
+560,Age Perform Product,Electronics,LG,1369.63,2027-01-21 20:54:38,2027-01-31 23:59:59,Y
+561,Provide Total Product,Electronics,Sony,520.68,2027-01-02 18:53:23,2027-01-17 18:53:23,Y
+562,Daughter Cold Product,Electronics,Apple,1169.21,2027-01-03 20:07:55,2027-01-17 20:07:55,Y
+563,Note Senior Product,Home,Samsung,808.66,2027-01-09 06:48:30,2027-01-31 23:59:59,Y
+564,Spring Discussion Product,Clothing,Sony,831.1,2027-01-20 08:51:52,2027-01-31 23:59:59,Y
+565,Fire How Product,Clothing,LG,200.18,2027-01-12 16:35:41,2027-01-13 16:35:41,Y
+566,Bad Appear Product,Electronics,Nike,1228.13,2027-01-30 08:45:07,2027-01-31 23:59:59,Y
+567,Maintain Fall Product,Clothing,LG,270.37,2027-01-22 07:48:06,2027-01-31 23:59:59,Y
+568,Tonight Fly Product,Electronics,Nestle,267.32,2027-01-08 19:52:01,2027-01-31 23:59:59,Y
+569,Could Sound Product,Home,LG,930.29,2027-01-01 02:17:03,2027-01-14 02:17:03,Y
+570,Good Lose Product,Grocery,Nestle,571.33,2027-01-01 13:22:03,2027-01-30 13:22:03,Y
+571,Mission Police Product,Electronics,Sony,413.13,2027-01-11 21:22:01,2027-01-31 23:59:59,Y
+572,Rate Store Product,Clothing,Nike,893.08,2027-01-08 10:12:13,2027-01-31 23:59:59,Y
+573,Conference Of Product,Electronics,Adidas,514.59,2027-01-21 15:23:56,2027-01-31 23:59:59,Y
+574,Investment Staff Product,Electronics,Samsung,367.3,2027-01-27 01:27:55,2027-01-31 23:59:59,Y
+575,Store Social Product,Clothing,Sony,374.69,2027-01-23 05:46:13,2027-01-31 23:59:59,Y
+576,Large Respond Product,Clothing,Samsung,1457.58,2027-01-23 06:38:56,2027-01-31 23:59:59,Y
+577,Tree Decide Product,Clothing,Nestle,729.65,2027-01-04 21:44:15,2027-01-31 23:59:59,Y
+578,Design Whatever Product,Toys,Nike,540.06,2027-01-17 08:44:52,2027-01-31 23:59:59,Y
+579,Particular Share Product,Toys,Apple,1074.18,2027-01-27 21:16:18,2027-01-30 21:16:18,Y
+580,Cold Hard Product,Clothing,Sony,1470.9,2027-01-03 11:33:18,2027-01-31 23:59:59,Y
+581,Keep Authority Product,Electronics,Nestle,1157.64,2027-01-09 02:01:31,2027-01-31 23:59:59,Y
+582,Probably Set Product,Electronics,Nestle,77.06,2027-01-20 02:38:27,2027-01-31 23:59:59,Y
+583,Single Direction Product,Sports,Nike,48.63,2027-01-22 08:41:12,2027-01-31 08:41:12,Y
+584,Position Protect Product,Toys,Nike,778.44,2027-01-08 08:26:58,2027-01-31 23:59:59,Y
+585,Drive Pass Product,Sports,LG,1270.01,2027-01-14 09:43:39,2027-01-31 23:59:59,Y
+586,Away Effort Product,Home,LG,1117.55,2027-01-03 15:38:01,2027-01-31 23:59:59,Y
+587,Attention Cold Product,Grocery,Adidas,312.97,2027-01-26 03:08:55,2027-01-31 23:59:59,Y
+588,Boy Scene Product,Clothing,LG,276.05,2027-01-26 08:20:47,2027-01-31 23:59:59,Y
+589,Ball Keep Product,Sports,Adidas,394.53,2027-01-27 05:06:32,2027-01-31 23:59:59,Y
+590,Material Data Product,Clothing,Nike,496.56,2027-01-08 15:32:13,2027-01-31 23:59:59,Y
+591,Record Food Product,Clothing,Sony,1024.51,2027-01-28 08:14:32,2027-01-31 23:59:59,Y
+592,Trip Receive Product,Clothing,Adidas,20.22,2027-01-09 07:01:37,2027-01-31 23:59:59,Y
+593,Test Risk Product,Clothing,Adidas,1283.77,2027-01-30 20:08:26,2027-01-31 23:59:59,Y
+594,Language Federal Product,Electronics,Apple,965.6,2027-01-25 16:19:59,2027-01-29 16:19:59,Y
+595,Consider Bill Product,Electronics,Adidas,236.3,2027-01-07 14:33:23,2027-01-31 23:59:59,Y
+596,So Themselves Product,Home,Apple,495.43,2027-01-12 18:17:23,2027-01-31 23:59:59,Y
+597,Check Until Product,Grocery,Apple,6.31,2027-01-11 10:04:46,2027-01-31 23:59:59,Y
+598,Serious Everything Product,Sports,Apple,427.38,2027-01-19 17:38:43,2027-01-31 23:59:59,Y
+599,Painting Apply Product,Toys,Nestle,936.76,2027-01-29 13:57:45,2027-01-31 23:59:59,Y
+600,Huge Walk Product,Clothing,Adidas,295.87,2027-01-19 03:33:10,2027-01-31 23:59:59,Y
+90,Fast Product,Clothing,Sony,102.02,2026-05-26 18:23:54,2027-01-22 18:23:43,Y
+18,Upon Product,Electronics,Adidas,75.58,2026-02-07 06:19:11,2027-01-13 00:13:55,Y
+121,Enter Product,Clothing,Nike,170.63,2026-06-07 12:28:58,2027-01-22 03:41:34,N
+166,Growth Product,Clothing,Samsung,328.75,2026-06-11 05:21:40,2027-01-22 05:44:42,Y
+118,State Product,Home,Samsung,80.34,2026-05-17 00:39:46,2027-01-11 23:14:19,Y
+233,Wind Product,Electronics,LG,427.06,2026-02-07 09:08:47,2027-01-05 08:18:20,Y
+400,Develop Product,Home,Adidas,292.99,2026-01-17 01:17:51,2027-01-29 20:47:44,Y
+54,Yeah Product,Sports,Sony,324.81,2026-03-29 08:02:24,2027-01-11 16:53:25,Y
+107,Situation Product,Sports,Nestle,9.59,2026-06-10 09:13:56,2027-01-16 17:38:39,Y
+195,At Product,Grocery,Samsung,300.6,2026-02-12 15:30:35,2027-01-02 00:47:40,Y
