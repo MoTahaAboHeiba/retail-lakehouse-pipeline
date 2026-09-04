@@ -1,0 +1,13 @@
+product_id,product_name,category,brand,price,created_timestamp,updated_timestamp,is_active
+192,Glass Product,Toys,Nestle,104.95,2026-02-22 06:48:36,2027-02-04 08:24:14,Y
+514,Point Century Product,Home,Apple,1013.9,2027-01-10 10:24:02,2027-02-22 15:06:26,Y
+63,Serve Product,Home,Nike,432.66,2026-03-26 03:18:58,2027-02-08 10:21:36,Y
+377,Agent Product,Sports,Apple,348.7,2026-02-22 11:40:48,2027-02-04 22:23:41,Y
+22,Stuff Product,Electronics,Apple,371.02,2026-06-01 03:05:11,2027-02-18 01:42:34,Y
+200,Difference Product,Home,Samsung,381.8,2026-03-02 14:55:56,2027-02-01 18:55:11,Y
+109,Task Product,Electronics,Apple,480.0,2026-04-25 04:42:44,2027-02-01 23:30:09,Y
+496,Education Product,Sports,Sony,406.48,2026-02-24 13:30:46,2027-02-21 16:36:59,Y
+554,Staff Happen Product,Toys,Sony,32.26,2027-01-16 14:58:24,2027-02-05 10:58:46,Y
+165,Year Product,Grocery,Sony,245.02,2026-05-03 19:18:09,2027-02-03 02:41:10,N
+234,Choose Product,Grocery,Nike,422.24,2026-06-20 08:37:33,2027-02-09 23:59:34,Y
+363,He Product,Clothing,LG,433.59,2026-03-14 08:51:15,2027-02-09 11:29:59,Y

@@ -1,0 +1,49 @@
+{
+  "batch_id": "batch_002",
+  "cursor_column": "updated_timestamp",
+  "primary_keys": {
+    "customers": "customer_id",
+    "products": "product_id",
+    "employees": "employee_id",
+    "orders": "order_id",
+    "order_items": "order_item_id"
+  },
+  "new_records": {
+    "customers": 0,
+    "products": 0,
+    "employees": 0,
+    "orders": 100000,
+    "order_items": 300415
+  },
+  "updated_records": {
+    "customers": 110,
+    "products": 12,
+    "employees": 9,
+    "orders": 1100,
+    "order_items": 1653
+  },
+  "maximum_updated_timestamp": "2027-02-28 23:59:59",
+  "date_window": {
+    "start": "2027-002-01 00:00:00",
+    "end": "2027-02-28 23:59:59"
+  },
+  "rows": {
+    "customers": 110,
+    "products": 12,
+    "employees": 9,
+    "orders": 101100,
+    "order_items": 302068
+  },
+  "validation": {
+    "pk_unique_within_batch": true,
+    "updated_timestamp_not_null": true,
+    "referential_integrity": true,
+    "cross_batch_newer_updates": {
+      "customers": 99,
+      "products": 2,
+      "employees": 2,
+      "orders": 1007,
+      "order_items": 1512
+    }
+  }
+}

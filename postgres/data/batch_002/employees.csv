@@ -1,0 +1,10 @@
+employee_id,store_id,first_name,last_name,email,job_title,salary,created_timestamp,updated_timestamp,is_active
+231,11,Jesus,West,fjones@example.com,Building control surveyor,91869.27,2026-02-24 17:23:21,2027-02-09 20:43:35,Y
+228,14,Jeffrey,Butler,alishanorman@example.com,Counsellor,80321.97,2026-02-11 07:45:48,2027-02-14 17:15:26,Y
+98,19,Abigail,Dorsey,qbutler@example.net,Marketing executive,41445.85,2026-02-05 08:25:30,2027-02-03 16:39:05,Y
+215,10,Jennifer,Walker,garciamichael@example.org,Telecommunications researcher,54630.18,2026-02-02 22:56:13,2027-02-17 00:36:33,Y
+19,15,John,Dixon,yriley@example.org,"Clinical scientist, histocompatibility and immunogenetics",88584.38,2026-06-15 15:11:04,2027-02-13 07:57:10,Y
+279,5,Elizabeth,Boyd,elizabeth.boyd.279@example.com,Plant breeder/geneticist,65065.52,2027-01-12 12:23:41,2027-02-20 09:49:24,Y
+127,6,Angela,Kim,carpenterapril@example.net,"Therapist, speech and language",76459.35,2026-01-04 08:28:08,2027-02-23 08:46:37,Y
+300,5,Emily,Guzman,emily.guzman.300@example.com,"Scientist, audiological",93077.67,2027-01-12 16:00:27,2027-02-23 18:18:14,Y
+33,21,Sarah,Daniels,marksmith@example.org,Analytical chemist,41189.65,2026-01-11 06:01:17,2027-02-23 04:57:40,Y

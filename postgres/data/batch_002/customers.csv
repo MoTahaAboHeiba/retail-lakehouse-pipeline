@@ -1,0 +1,111 @@
+customer_id,first_name,last_name,email,phone,city,province,country,created_timestamp,updated_timestamp,is_active
+14390,Nicholas,Wheeler,nicholas.wheeler.14390@example.com,+1-783-388-6706x0602,East Francisco,Arizona,Canada,2027-01-16 02:15:05,2027-02-07 18:50:44,Y
+5140,Ryan,Flynn,ryan.flynn.5140@example.com,+1-453-302-4523,Melissafort,Wyoming,Canada,2027-01-12 18:34:43,2027-02-11 13:09:44,Y
+6428,Lacey,Luna,lacey.luna.6428@example.com,268-285-4221,Thomasville,Kentucky,Canada,2027-01-05 12:00:37,2027-02-12 11:35:17,Y
+8681,Michelle,Allen,michelle.allen.8681@example.com,(827)820-1449,New Robinfort,Oregon,Canada,2027-01-08 04:22:15,2027-02-06 12:19:36,Y
+2060,Ivan,Contreras,ivan.contreras.2060@example.com,627-243-2366,South Adammouth,New Jersey,Canada,2027-01-05 20:27:50,2027-02-07 02:34:31,Y
+11726,Whitney,Day,whitney.day.11726@example.com,(904)988-9306,Jamesville,Pennsylvania,Canada,2027-01-03 13:02:11,2027-02-24 22:42:48,Y
+8675,Daniel,Romero,daniel.romero.8675@example.com,9745339172,Cherylshire,Iowa,Canada,2027-01-05 12:46:16,2027-02-11 19:38:57,Y
+21547,Kaitlyn,Williams,kaitlyn.williams.21547@example.com,+1-709-265-9557x97884,Jonathanstad,Florida,Canada,2027-01-28 13:53:31,2027-02-02 05:31:34,Y
+5018,Curtis,Barry,curtis.barry.5018@example.com,828.210.1679,Port Jamie,Kentucky,Canada,2027-01-09 11:45:39,2027-02-15 04:31:26,Y
+16595,Donna,Morse,donna.morse.16595@example.com,(381)926-2586,East Ericberg,Michigan,Canada,2027-01-04 19:40:43,2027-02-10 08:59:16,Y
+11512,Chris,Harrison,chris.harrison.11512@example.com,+1-736-748-7617x25231,North Derekmouth,West Virginia,Canada,2027-01-22 06:32:29,2027-02-09 15:48:21,Y
+11355,Tara,Durham,tara.durham.11355@example.com,382-698-0220x448,Schultztown,Minnesota,Canada,2027-01-26 21:26:09,2027-02-07 21:05:08,Y
+17610,Sabrina,Rosales,sabrina.rosales.17610@example.com,704.576.9137x414,East Mariashire,Pennsylvania,Canada,2027-01-23 13:40:51,2027-02-22 18:59:12,Y
+20280,James,Snyder,james.snyder.20280@example.com,001-711-209-4055x4462,Anthonystad,Mississippi,Canada,2027-01-06 02:06:51,2027-02-27 23:09:32,Y
+19028,Derek,Perry,derek.perry.19028@example.com,587-557-7757,Andersonfort,Arkansas,Canada,2027-01-25 21:52:14,2027-02-24 00:36:34,Y
+18386,Jacob,Fitzpatrick,jacob.fitzpatrick.18386@example.com,355.973.7771x09890,West Ericberg,Utah,Canada,2027-01-06 02:55:25,2027-02-16 15:51:40,Y
+1753,Jose,Owen,parkersonia@example.org,939-480-3448x2659,Lindaton,Ohio,Canada,2026-06-30 11:04:55,2027-02-26 18:02:10,Y
+9627,Melanie,Gonzalez,melanie.gonzalez.9627@example.com,567-843-1049x517,South Morganmouth,Iowa,Canada,2027-01-30 03:13:17,2027-02-05 18:49:28,Y
+21828,Sarah,Ellis,sarah.ellis.21828@example.com,393-418-8297,Brittanytown,North Dakota,Canada,2027-01-20 14:30:48,2027-02-11 00:25:26,Y
+18344,Wendy,Morales,wendy.morales.18344@example.com,325-975-8767x494,South Kellyshire,Kansas,Canada,2027-01-01 16:55:29,2027-02-18 12:15:52,Y
+15119,Paul,Walker,paul.walker.15119@example.com,808-848-5736x2927,South Alishachester,New York,Canada,2027-01-08 13:13:20,2027-02-28 00:50:56,Y
+742,Kristen,Woods,schwartzvictoria@example.net,646.771.9915,Port Tina,Washington,Canada,2026-05-28 21:14:52,2027-02-20 11:04:14,Y
+1141,Michael,Hamilton,garciaalexander@example.org,494.808.4033x6076,Garciastad,Vermont,Canada,2026-01-06 00:59:35,2027-02-04 18:49:42,Y
+15403,Grant,Thornton,grant.thornton.15403@example.com,+1-623-473-4010x63088,Port Peter,West Virginia,Canada,2027-01-19 13:31:36,2027-02-14 19:48:51,Y
+15937,Carolyn,Rowland,carolyn.rowland.15937@example.com,+1-309-674-0965x37479,Rosebury,Louisiana,Canada,2027-01-23 17:44:54,2027-02-21 17:47:44,Y
+9757,Megan,Pitts,megan.pitts.9757@example.com,758-425-6421,Jeffreyville,Alabama,Canada,2027-01-29 19:56:20,2027-02-17 07:42:09,Y
+17578,Kyle,Henderson,kyle.henderson.17578@example.com,397-504-8651x5269,West Philip,North Carolina,Canada,2027-01-15 16:31:53,2027-02-09 08:38:49,Y
+8014,John,Stein,john.stein.8014@example.com,708-234-3688x543,Lake Tammychester,Louisiana,Canada,2027-01-03 02:52:06,2027-02-05 10:21:25,Y
+21611,Elaine,Fitzgerald,elaine.fitzgerald.21611@example.com,001-542-542-4008,New Johnside,Wisconsin,Canada,2027-01-17 15:09:45,2027-02-09 22:39:51,Y
+9309,Angel,Lynn,angel.lynn.9309@example.com,482.357.8090x151,Valeriechester,New Hampshire,Canada,2027-01-16 15:41:25,2027-02-25 12:53:56,Y
+20065,Kathy,Mckee,kathy.mckee.20065@example.com,939-609-0684,Martinezside,Rhode Island,Canada,2027-01-12 06:49:49,2027-02-27 17:34:49,Y
+21658,Belinda,Merritt,belinda.merritt.21658@example.com,+1-415-434-2358,Benjamintown,Connecticut,Canada,2027-01-16 09:04:25,2027-02-21 10:56:58,Y
+12084,Anna,Wilson,anna.wilson.12084@example.com,413.549.1717,Kimville,Oklahoma,Canada,2027-01-17 05:28:06,2027-02-15 15:46:24,Y
+18146,April,Espinoza,april.espinoza.18146@example.com,225-342-2150x591,Tammyport,Utah,Canada,2027-01-30 03:01:40,2027-02-03 06:23:20,Y
+16401,Kristin,Cabrera,kristin.cabrera.16401@example.com,+1-865-627-9418x0803,Lake Valerieberg,Minnesota,Canada,2027-01-27 05:51:14,2027-02-01 13:38:22,Y
+19472,John,Small,john.small.19472@example.com,(720)895-6479x42868,South Karenfort,Massachusetts,Canada,2027-01-30 09:45:19,2027-02-24 16:07:46,Y
+1849,Ronald,Young,stephanie14@example.org,(456)359-7086,East Kathryn,Indiana,Canada,2026-06-04 17:01:46,2027-02-06 20:07:50,Y
+3013,Austin,Cooper,austin.cooper.3013@example.com,792.327.3655,Lake Edwardberg,California,Canada,2027-01-18 12:23:02,2027-02-20 21:52:27,Y
+12141,Scott,Wood,scott.wood.12141@example.com,+1-326-454-0488x182,Evanschester,Minnesota,Canada,2027-01-19 04:25:02,2027-02-20 13:24:31,Y
+7623,Tyler,Murillo,tyler.murillo.7623@example.com,+1-755-687-3263x27798,Smithport,Virginia,Canada,2027-01-21 16:22:54,2027-02-14 12:06:01,Y
+1620,Diana,Mcdonald,bethanysmith@example.net,(834)905-1147x82255,Nataliebury,New York,Canada,2026-02-27 14:35:24,2027-02-19 21:24:03,N
+16698,Preston,Scott,preston.scott.16698@example.com,001-291-223-7667x76860,Bartlettport,South Dakota,Canada,2027-01-03 07:23:35,2027-02-03 07:39:12,Y
+11983,Alan,Johnson,alan.johnson.11983@example.com,781-672-2136,New Robert,Michigan,Canada,2027-01-12 03:59:32,2027-02-09 14:40:51,Y
+17456,Joseph,Morgan,joseph.morgan.17456@example.com,001-525-638-4258x482,Martinstad,Alabama,Canada,2027-01-17 15:25:32,2027-02-13 17:09:17,Y
+5320,Juan,Owen,juan.owen.5320@example.com,3773233615,North Kenneth,Louisiana,Canada,2027-01-13 04:30:07,2027-02-22 18:34:17,Y
+2801,James,Flynn,james.flynn.2801@example.com,(200)883-4425x6695,Port William,Hawaii,Canada,2027-01-24 12:32:34,2027-02-16 00:27:26,Y
+14207,Daniel,Meyer,daniel.meyer.14207@example.com,+1-942-994-6860x8756,South Eric,Maryland,Canada,2027-01-09 01:23:46,2027-02-25 03:29:13,Y
+13826,Paige,Hampton,paige.hampton.13826@example.com,001-795-579-1144x8410,Lake Henryberg,Massachusetts,Canada,2027-01-17 03:08:50,2027-02-01 22:38:03,Y
+18735,Stephanie,Quinn,stephanie.quinn.18735@example.com,001-941-309-9448x3152,East Michael,Louisiana,Canada,2027-01-01 23:11:57,2027-02-08 18:34:23,Y
+282,Keith,Gill,ryanmcdowell@example.com,+1-970-572-1550x0109,East Scott,Rhode Island,Canada,2026-03-28 18:02:52,2027-02-04 12:22:10,Y
+1329,Elizabeth,Lang,johnsonadriana@example.com,+1-989-773-5689,Phillipsbury,Montana,Canada,2026-01-19 11:02:34,2027-02-04 02:25:48,Y
+21050,David,Gonzalez,david.gonzalez.21050@example.com,001-531-744-0081x2409,Bullockhaven,Florida,Canada,2027-01-17 05:33:43,2027-02-23 19:35:59,Y
+20384,Scott,Marks,scott.marks.20384@example.com,+1-883-924-8621,Whiteport,Rhode Island,Canada,2027-01-25 13:52:56,2027-02-16 05:54:26,Y
+395,Kaitlin,Johnson,jennifernguyen@example.net,566.641.9007,Lake Timothy,New Mexico,Canada,2026-04-22 08:26:19,2027-02-14 15:46:00,Y
+7164,Louis,Sellers,louis.sellers.7164@example.com,+1-292-779-2992x2136,Kimside,Mississippi,Canada,2027-01-21 15:25:13,2027-02-07 19:54:06,Y
+13695,Krystal,Payne,krystal.payne.13695@example.com,413-885-8553,Port Sarahborough,Oklahoma,Canada,2027-01-27 21:10:34,2027-02-27 03:40:34,Y
+2808,David,Cowan,david.cowan.2808@example.com,519-209-5156,North Steveland,Alaska,Canada,2027-01-17 16:19:22,2027-02-02 03:40:11,Y
+9304,Michael,Johnson,michael.johnson.9304@example.com,(288)278-9633x3576,North Albert,North Dakota,Canada,2027-01-17 04:08:53,2027-02-07 21:43:11,Y
+12768,Sean,Wilson,sean.wilson.12768@example.com,+1-326-787-4998x661,North Derekmouth,South Dakota,Canada,2027-01-21 10:13:37,2027-02-27 08:14:45,Y
+14057,Debbie,Johnson,debbie.johnson.14057@example.com,467-474-4777x5481,Jessicaland,Oklahoma,Canada,2027-01-19 06:39:54,2027-02-28 13:39:08,Y
+18848,Ryan,Riley,ryan.riley.18848@example.com,+1-832-675-5481,New Cathyview,Colorado,Canada,2027-01-06 00:31:31,2027-02-21 10:23:27,Y
+7712,Carmen,Cruz,carmen.cruz.7712@example.com,604.382.1560,South Wesleyland,Illinois,Canada,2027-01-28 11:12:53,2027-02-07 10:03:21,Y
+4247,Sharon,Ritter,sharon.ritter.4247@example.com,(973)913-8613,South Derrick,Idaho,Canada,2027-01-13 12:37:20,2027-02-20 23:32:22,Y
+19942,Jeremy,Kim,jeremy.kim.19942@example.com,808-400-6628,Lake Jenniferton,Tennessee,Canada,2027-01-10 21:57:23,2027-02-20 09:18:32,Y
+12037,Katelyn,Hoffman,katelyn.hoffman.12037@example.com,(902)379-8325x8183,North Ashley,California,Canada,2027-01-15 09:31:24,2027-02-23 22:54:23,Y
+12517,Andrea,Webb,andrea.webb.12517@example.com,955-623-8399,Lake Jodifurt,Wyoming,Canada,2027-01-06 08:23:28,2027-02-26 00:18:33,Y
+164,Anthony,Anderson,hgarcia@example.org,342.839.9383x5905,New Brandon,Vermont,Canada,2026-01-24 09:20:47,2027-02-23 20:17:02,Y
+16071,Miranda,Flores,miranda.flores.16071@example.com,9728026495,West Jessicaside,Massachusetts,Canada,2027-01-24 16:52:02,2027-02-17 08:25:02,Y
+5597,Joseph,Bennett,joseph.bennett.5597@example.com,949-432-7226x671,Danielland,Washington,Canada,2027-01-01 02:56:29,2027-02-01 07:01:24,Y
+2011,Elijah,Sellers,elijah.sellers.2011@example.com,699.339.0216x892,Oliviachester,Arkansas,Canada,2027-01-12 15:50:33,2027-02-09 09:33:05,Y
+6613,Jacob,Cole,jacob.cole.6613@example.com,464.717.1059x21295,Gregorytown,Utah,Canada,2027-01-01 20:51:20,2027-02-24 10:44:02,Y
+10756,Barbara,Hahn,barbara.hahn.10756@example.com,547.507.3543,Lake Saraville,Delaware,Canada,2027-01-10 12:20:39,2027-02-15 05:36:23,Y
+1558,Nathan,Kim,mark92@example.org,+1-739-513-7812x17871,Port Patricia,Idaho,Canada,2026-04-09 13:35:31,2027-02-20 14:44:46,Y
+7134,Willie,Reyes,willie.reyes.7134@example.com,616-666-4268x429,South Rachel,Arizona,Canada,2027-01-10 23:13:25,2027-02-17 14:58:06,Y
+9270,Melissa,Anderson,melissa.anderson.9270@example.com,+1-814-273-3190x0802,Port Ruben,Delaware,Canada,2027-01-07 23:00:43,2027-02-03 08:29:58,Y
+17382,Sherri,Price,sherri.price.17382@example.com,779-344-9711x487,Maldonadofurt,Ohio,Canada,2027-01-10 20:11:29,2027-02-24 11:32:50,Y
+19040,Curtis,Colon,curtis.colon.19040@example.com,971.764.5821x45719,Dylantown,Pennsylvania,Canada,2027-01-25 13:49:10,2027-02-12 21:34:29,Y
+15000,Jeffery,Richard,jeffery.richard.15000@example.com,(306)745-0630x645,Jacobsmouth,North Carolina,Canada,2027-01-02 06:38:11,2027-02-28 16:23:05,Y
+17634,Matthew,Barker,matthew.barker.17634@example.com,860.235.6810,West Amy,Kansas,Canada,2027-01-16 13:21:32,2027-02-04 08:33:15,Y
+16911,Tyler,George,tyler.george.16911@example.com,+1-206-666-8756x8301,West Tamara,Idaho,Canada,2027-01-04 17:11:15,2027-02-16 08:51:18,Y
+8673,Randall,Pineda,randall.pineda.8673@example.com,974-567-5773x78380,East Frank,Florida,Canada,2027-01-19 19:29:11,2027-02-13 21:17:28,Y
+19767,Matthew,Steele,matthew.steele.19767@example.com,570-386-6326,South Andrea,New Jersey,Canada,2027-01-05 23:35:50,2027-02-10 13:07:18,Y
+4967,Charles,Hernandez,charles.hernandez.4967@example.com,254.621.2638x599,South Keithview,Minnesota,Canada,2027-01-06 03:00:03,2027-02-25 23:56:15,Y
+21723,Heidi,Payne,heidi.payne.21723@example.com,6672881338,Stevensview,Massachusetts,Canada,2027-01-09 00:06:42,2027-02-15 18:58:20,Y
+20027,Anna,Martinez,anna.martinez.20027@example.com,637-559-8708x2765,North Brittanyville,Idaho,Canada,2027-01-13 18:13:08,2027-02-06 16:22:17,Y
+5414,Justin,Higgins,justin.higgins.5414@example.com,001-935-304-5467x2492,New Morganview,Idaho,Canada,2027-01-29 20:32:53,2027-02-24 14:57:33,Y
+17947,Patrick,Mcmillan,patrick.mcmillan.17947@example.com,(792)765-7122,Deanhaven,Nebraska,Canada,2027-01-17 04:50:45,2027-02-25 00:54:25,Y
+4440,Anna,Nguyen,anna.nguyen.4440@example.com,(360)419-0485x8022,Ronaldshire,Pennsylvania,Canada,2027-01-26 14:04:23,2027-02-22 21:36:49,Y
+9726,Katherine,Day,katherine.day.9726@example.com,(807)898-6149x107,West Ianborough,Ohio,Canada,2027-01-07 16:16:43,2027-02-27 12:30:48,Y
+13469,Howard,Hansen,howard.hansen.13469@example.com,001-731-273-1083x38993,South Shellyville,Maine,Canada,2027-01-08 08:28:26,2027-02-20 10:29:13,Y
+9048,Natalie,Moore,natalie.moore.9048@example.com,813-670-1544,East Mary,Ohio,Canada,2027-01-29 20:14:18,2027-02-27 02:08:09,Y
+3351,Michael,Garcia,michael.garcia.3351@example.com,489.522.0911x890,West Jasmineport,Utah,Canada,2027-01-09 10:43:17,2027-02-23 17:58:15,Y
+3798,Oscar,Reese,oscar.reese.3798@example.com,925.371.2030,Reedton,Utah,Canada,2027-01-20 21:26:50,2027-02-05 08:31:39,Y
+9622,Heather,Murray,heather.murray.9622@example.com,474-339-8343x06859,Melissafort,Indiana,Canada,2027-01-06 17:46:43,2027-02-09 01:20:22,Y
+15374,Jonathan,Lopez,jonathan.lopez.15374@example.com,3262820925,Kennethmouth,Mississippi,Canada,2027-01-30 02:07:11,2027-02-22 18:02:55,Y
+14130,Jonathan,Medina,jonathan.medina.14130@example.com,992.478.7162,South Melanietown,North Carolina,Canada,2027-01-10 02:51:37,2027-02-06 09:30:45,Y
+20918,Christine,Bennett,christine.bennett.20918@example.com,3339708922,Lake Edwardberg,Kentucky,Canada,2027-01-07 00:50:44,2027-02-16 07:42:36,Y
+3114,Alyssa,Gomez,alyssa.gomez.3114@example.com,001-537-705-6147x0970,Bullockhaven,Montana,Canada,2027-01-26 07:50:34,2027-02-26 02:29:05,Y
+19408,Sabrina,Santos,sabrina.santos.19408@example.com,+1-892-301-1527x252,East Regina,South Carolina,Canada,2027-01-03 14:34:22,2027-02-20 22:18:57,Y
+19704,Dwayne,Miller,dwayne.miller.19704@example.com,(615)338-8185,East Williamborough,Missouri,Canada,2027-01-08 18:04:51,2027-02-17 01:26:59,Y
+11206,Sean,Fletcher,sean.fletcher.11206@example.com,990.519.4631,New Michellefurt,Michigan,Canada,2027-01-12 00:10:52,2027-02-02 09:58:38,Y
+21994,Kevin,Perez,kevin.perez.21994@example.com,(569)736-4710x0964,Rodriguezstad,Minnesota,Canada,2027-01-26 19:05:29,2027-02-25 05:45:09,Y
+2323,Gary,Rodriguez,gary.rodriguez.2323@example.com,(731)733-0919x4856,New Jared,Arkansas,Canada,2027-01-28 22:42:26,2027-02-14 14:34:44,Y
+20848,Charles,Peters,charles.peters.20848@example.com,747-921-4998x130,Gilbertville,Massachusetts,Canada,2027-01-11 19:08:47,2027-02-28 02:25:42,Y
+6917,Tony,Powell,tony.powell.6917@example.com,(407)449-0657x332,South Jamesfort,New Mexico,Canada,2027-01-04 02:42:16,2027-02-19 13:51:24,Y
+19072,Ryan,Sanchez,ryan.sanchez.19072@example.com,356-522-6816x2257,New Nicholas,Idaho,Canada,2027-01-06 22:07:16,2027-02-03 11:20:09,Y
+1720,Judith,Molina,victoria08@example.net,516-321-0806x12124,Sarahbury,Colorado,Canada,2026-01-16 03:47:37,2027-02-17 07:54:51,Y
+12329,Matthew,Berger,matthew.berger.12329@example.com,2858528509,West Jamestown,Rhode Island,Canada,2027-01-10 09:35:56,2027-02-06 12:12:10,Y
+18393,Shelby,Jacobson,shelby.jacobson.18393@example.com,482.640.5796,Gardnerberg,Arizona,Canada,2027-01-10 18:39:48,2027-02-16 11:48:58,Y
+8778,Joshua,Hicks,joshua.hicks.8778@example.com,001-523-920-0256x42475,Carlafort,Ohio,Canada,2027-01-19 17:57:27,2027-02-02 09:44:24,Y

@@ -1,0 +1,26 @@
+store_id,store_name,city,province,country,created_timestamp,updated_timestamp,is_active
+1,Meridian Grocers - New York,New York,New York,United States,2026-02-22 07:09:17,2026-03-14 06:59:24,Y
+2,Meridian Grocers - Los Angeles,Los Angeles,California,United States,2026-04-02 15:29:36,2026-05-02 12:27:36,Y
+3,Meridian Grocers - Chicago,Chicago,Illinois,United States,2026-05-15 07:47:12,2026-05-27 04:49:37,Y
+4,Meridian Grocers - Houston,Houston,Texas,United States,2026-03-26 16:04:17,2026-04-13 09:59:04,Y
+5,Meridian Grocers - Phoenix,Phoenix,Arizona,United States,2026-01-21 01:28:36,2026-02-06 08:43:52,Y
+6,Meridian Grocers - Philadelphia,Philadelphia,Pennsylvania,United States,2026-02-16 22:59:41,2026-03-16 06:14:25,Y
+7,Meridian Grocers - San Antonio,San Antonio,Texas,United States,2026-02-15 01:38:17,2026-03-04 09:44:04,Y
+8,Meridian Grocers - San Diego,San Diego,California,United States,2026-01-17 04:33:19,2026-01-18 10:47:34,Y
+9,Meridian Grocers - Dallas,Dallas,Texas,United States,2026-05-29 15:29:06,2026-06-15 16:49:56,Y
+10,Meridian Grocers - Austin,Austin,Texas,United States,2026-02-20 15:07:28,2026-02-23 06:19:34,Y
+11,Meridian Grocers - Columbus,Columbus,Ohio,United States,2026-02-25 19:31:19,2026-03-15 20:08:46,Y
+12,Meridian Grocers - Charlotte,Charlotte,North Carolina,United States,2026-01-29 23:56:28,2026-02-23 20:09:05,Y
+13,Meridian Grocers - Seattle,Seattle,Washington,United States,2026-06-07 14:00:16,2026-07-02 03:38:33,Y
+14,Meridian Grocers - Denver,Denver,Colorado,United States,2026-02-15 10:32:30,2026-03-03 20:13:49,Y
+15,Meridian Grocers - Toronto,Toronto,Ontario,Canada,2026-05-17 07:21:17,2026-06-08 00:53:36,Y
+16,Meridian Grocers - Montreal,Montreal,Quebec,Canada,2026-01-29 05:31:00,2026-02-08 22:01:31,Y
+17,Meridian Grocers - Vancouver,Vancouver,British Columbia,Canada,2026-01-17 13:43:19,2026-01-21 04:04:59,Y
+18,Meridian Grocers - Calgary,Calgary,Alberta,Canada,2026-02-16 06:49:06,2026-03-12 14:02:25,Y
+19,Meridian Grocers - Ottawa,Ottawa,Ontario,Canada,2026-03-23 16:30:06,2026-04-14 02:29:45,Y
+20,Meridian Grocers - Edmonton,Edmonton,Alberta,Canada,2026-06-22 04:20:10,2026-06-28 17:10:20,Y
+21,Meridian Grocers - Winnipeg,Winnipeg,Manitoba,Canada,2026-06-06 21:10:20,2026-07-07 13:41:01,Y
+22,Meridian Grocers - Quebec City,Quebec City,Quebec,Canada,2026-04-17 23:17:14,2026-05-17 07:48:13,Y
+23,Meridian Grocers - Halifax,Halifax,Nova Scotia,Canada,2026-03-19 11:09:19,2026-03-30 10:32:12,Y
+24,Meridian Grocers - Saskatoon,Saskatoon,Saskatchewan,Canada,2026-04-26 09:27:36,2026-05-08 22:28:24,Y
+25,Meridian Grocers - Regina,Regina,Saskatchewan,Canada,2026-01-15 13:22:41,2026-02-09 17:52:30,Y
