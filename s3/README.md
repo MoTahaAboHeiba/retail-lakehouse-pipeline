@@ -38,9 +38,9 @@ Two separate merge operations at two separate layers: the Lakeflow pipeline merg
 
 ## Why the pipeline runs outside Airflow, and how Airflow handles that
 
-**Decision:** The S3 Lakeflow pipeline runs on its own Databricks-managed schedule, outside Airflow's control. A dedicated DAG task polls the Databricks Pipelines API and checks the latest pipeline update state before the entire downstream procurement chain, `supplier_deliveries_tech` through `dim_supplier` and `fact_supplier_deliveries`, is allowed to run. The task raises if the pipeline's latest update is not in a completed, current state.
+**Decision:** The S3 Lakeflow pipeline runs on its own Databricks-managed schedule, outside Airflow's control. A dedicated DAG task polls the Databricks Pipelines API and checks the latest pipeline update state before the entire downstream Supply chain, `supplier_deliveries_tech` through `dim_supplier` and `fact_supplier_deliveries`, is allowed to run. The task raises if the pipeline's latest update is not in a completed, current state.
 
-**Why:** A pipeline that runs outside your orchestrator is a scheduling assumption. You cannot set an Airflow dependency on a Databricks-managed trigger. Without an explicit check, the DAG proceeds against whatever bronze data happens to be there, complete or stale. Gating the full procurement chain, not just the first silver model, means a failed or still-running S3 pipeline cannot produce a `fact_supplier_deliveries` that appears complete but is built on partial data.
+**Why:** A pipeline that runs outside your orchestrator is a scheduling assumption. You cannot set an Airflow dependency on a Databricks-managed trigger. Without an explicit check, the DAG proceeds against whatever bronze data happens to be there, complete or stale. Gating the full Supply chain, not just the first silver model, means a failed or still-running S3 pipeline cannot produce a `fact_supplier_deliveries` that appears complete but is built on partial data.
 
 This is the same principle as the primary ingestion path in [`airflow/README.md`](../airflow/README.md): don't assume a source landed because it's scheduled to. Verify terminal state before downstream work depends on it.
 
