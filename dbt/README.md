@@ -169,7 +169,7 @@ dbt/
 
 ## Gold layer: galaxy schema
 
-Two independent business processes, Sales and Procurement, each with its own fact table at its own grain, sharing conformed dimensions only where the relationship is structurally real (`dim_date`, `dim_products_current`). `obt_business` feeds `fact_orders` only, `fact_supplier_deliveries` sources directly from `supplier_deliveries_tech`, there's no shared grain between the two processes to force through one big table.
+Two independent business processes, Sales and Supplies, each with its own fact table at its own grain, sharing conformed dimensions only where the relationship is structurally real (`dim_date`, `dim_products_current`). `obt_business` feeds `fact_orders` only, `fact_supplier_deliveries` sources directly from `supplier_deliveries_tech`, there's no shared grain between the two processes to force through one big table.
 
 **`dim_products_current` outrigger:** An SCD2 dimension is not unique on its natural key by design. Power BI cannot build a valid relationship against a non-unique column, so a direct relationship from either fact table to the full SCD2 `dim_products` is not possible. `dim_products_current` is pre-filtered to one active row per product and carries both `dbt_scd_id` (for `fact_supplier_deliveries`, current-state resolution) and `product_id` (for `fact_orders`, point-in-time resolution via the floor-gap join above). One pre-filtered view, two join paths, no duplication of SCD2 history.
 
