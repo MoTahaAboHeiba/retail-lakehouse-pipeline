@@ -20,14 +20,14 @@ flowchart LR
     stt --> sb[Silver business] --> sbt[Silver business tests]
     sbt --> eph[Gold ephemeral] --> snap["Snapshots\nSCD Type 2"] --> dd[dim_date]
     dd --> sales[Sales]
-    dd --> proc[Procurement]
+    dd --> proc[Supplies]
     sales --> gt[gold_tests]
     proc --> gt
 ```
 
 Each arrow is a hard dependency. If a stage fails, nothing downstream of it runs. No dbt task executes against partially ingested or partially tested data.
 
-After `dim_date` is built, the DAG forks into two independent branches, Sales and Procurement, and both rejoin at a single task, `gold_tests()`, which runs the full test suite against both fact tables together before either is considered done. See [Sales and Procurement run as parallel branches after `dim_date`](#sales-and-procurement-run-as-parallel-branches-after-dim_date) below for why.
+After `dim_date` is built, the DAG forks into two independent branches, Sales and Supplies, and both rejoin at a single task, `gold_tests()`, which runs the full test suite against both fact tables together before either is considered done. See [Sales and Supplies run as parallel branches after `dim_date`](#sales-and-Supplies-run-as-parallel-branches-after-dim_date) below for why.
 
 ---
 
@@ -37,11 +37,11 @@ After `dim_date` is built, the DAG forks into two independent branches, Sales an
 
 ![Sequential DAG run](../docs/sequential-dag-run.jpg)
 
-`orchestrate_sequential_baseline.py`. Every task, including Sales and Procurement, runs in strict order with no fork.
+`orchestrate_sequential_baseline.py`. Every task, including Sales and Supplies, runs in strict order with no fork.
 
 ![Parallel DAG run](../docs/parallel-dag-run.jpg)
 
-`orchestrate_parallel.py`. The DAG forks after `dim_date` into independent Sales and Procurement branches, then rejoins at `gold_tests()`.
+`orchestrate_parallel.py`. The DAG forks after `dim_date` into independent Sales and Supplies branches, then rejoins at `gold_tests()`.
 
 Four runs measured across both DAGs:
 
@@ -68,7 +68,7 @@ Task-level failure callbacks push to Gmail and Telegram independently. Both chan
 ```text
 airflow/
 ├── dags/
-│   ├── orchestrate_parallel.py              # Parallel: Sales/Procurement fork after dim_date
+│   ├── orchestrate_parallel.py              # Parallel: Sales/Supplies fork after dim_date
 │   └── orchestrate_sequential_baseline.py   # Sequential: same pipeline, no fork, timing baseline
 ├── config/
 ├── plugins/
@@ -108,11 +108,11 @@ Silver Business
 Silver Business Tests
 ```
 
-### Sales and Procurement run as parallel branches after `dim_date`
+### Sales and Supplies run as parallel branches after `dim_date`
 
-**Decision:** Once `dim_date` is built, the DAG forks into two independent branches, Sales and Procurement, running concurrently. Both rejoin at `gold_tests()`, which runs the full test suite against both fact tables before either is considered done.
+**Decision:** Once `dim_date` is built, the DAG forks into two independent branches, Sales and Supplies, running concurrently. Both rejoin at `gold_tests()`, which runs the full test suite against both fact tables before either is considered done.
 
-**Why:** Sales and Procurement depend on each other's shared conformed dimensions, not on each other's intermediate models. Running them sequentially enforces an ordering the data doesn't require. `orchestrate_sequential_baseline.py` exists to produce a real before/after comparison rather than assert the benefit without a number behind it. See [benchmark results](#sequential-vs-parallel-benchmark) above for the full data.
+**Why:** Sales and Supplies depend on each other's shared conformed dimensions, not on each other's intermediate models. Running them sequentially enforces an ordering the data doesn't require. `orchestrate_sequential_baseline.py` exists to produce a real before/after comparison rather than assert the benefit without a number behind it. See [benchmark results](#sequential-vs-parallel-benchmark) above for the full data.
 
 ### Ingestion runs as a monitored Databricks job, not inline Airflow logic
 
