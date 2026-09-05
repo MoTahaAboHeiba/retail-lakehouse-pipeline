@@ -164,5 +164,4 @@ These are not gaps to be filled later. They are structural boundaries from the s
 
 - **Employee-to-order attribution.** The source system does not record which employee handled which order. There is no `employee_id` on the orders table. Any metric that tries to connect individual employees to revenue is fabricated from the available data.
 - **Exact gross margin.** No traceability links a specific supplier delivery to the units later sold as orders. A margin calculation that divides procurement cost by sales revenue is an approximation across two independent business processes, not an exact figure.
-- **Real order date.** The `created_at` timestamp is used as the order date throughout. If any orders have a gap between when the customer placed the order and when the system created the record, time-based analysis inherits that lag with no way to detect it.
 - **Real-time data.** The report is an import snapshot. It reflects the state of the gold layer at the time of the last scheduled pipeline run and Power BI refresh. It does not update continuously.
