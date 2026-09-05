@@ -47,14 +47,14 @@ The pipeline produces two consumption surfaces: a three-page Power BI report for
 
 **Key numbers on this page:**
 
-- Total revenue: 18.95M
-- Revenue from completed orders only: 4.65M
-- Total order count: 10K
+- Total revenue: 38.89M
+- Revenue from completed orders only: 9.36M
+- Total order count: 19K
 - Distinct customers: 2K
 
 **What to look at:**
 
-The order status donut shows a roughly even four-way split: completed (24.47%), pending (24.36%), cancelled (25.87%), returned (25.3%). More than half of gross revenue never converts to a completed order. That is not a data quality issue, it is what the source data contains, and the report separates completed revenue from total revenue as a KPI so the distinction is always visible.
+The order status donut shows a roughly even four-way split: completed (24.06%), pending (24.73%), cancelled (26%), returned (25.22%). More than half of gross revenue never converts to a completed order. That is not a data quality issue, it is what the source data contains, and the report separates completed revenue from total revenue as a KPI so the distinction is always visible.
 
 The decomposition tree lets you drill from store to category to product. The top 5 stores bar chart shows Meridian Grocers locations accounting for the highest revenue concentration across all five positions.
 
