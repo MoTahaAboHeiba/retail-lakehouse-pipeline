@@ -70,7 +70,7 @@ Grain verified: 500 rows = `COUNT(DISTINCT product_id)` on `dim_products`.
 | Dimension | Strategy | Why |
 |---|---|---|
 | `dim_customers` | SCD2 | Historical accuracy for event analysis |
-| `dim_products` | SCD2, dual resolution | Point-in-time for Sales, current for Procurement |
+| `dim_products` | SCD2, dual resolution | Point-in-time for Sales, current for Supplies |
 | `dim_stores` | SCD2 | Store context must stay historically consistent |
 | `dim_orders` | SCD2 | Order master resolved at event time |
 | `dim_supplier` | SCD1 | Reference data, no stated history requirement |
